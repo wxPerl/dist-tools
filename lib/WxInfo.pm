@@ -95,15 +95,15 @@ sub _scan_source {
       my( $package, $pl_package );
 
       while( <IN> ) {
-        m/^package\s+(\w+)\;/ and do {
+        m/^package\s+([\w\:]+)\;/ and do {
           my $pl_package = $package = $1;
           $package =~ s/^Wx::/wx/;
           ${$pl_classes}{$package} = $pl_package;
           next;
         };
-        m/^sub\s+(\w+)/ and do {
+        m/^(?:\#\!)?sub\s+(\w+)/ and do {
           my $pl_method = "${pl_package}::${1}";
-          my $method = "${package}::{1}";
+          my $method = "${package}::${1}";
 
           ${$pl_funcs}{$method} = $pl_method;
           next;
