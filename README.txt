@@ -5,9 +5,9 @@
 * From the command prompt
   cd c:\temp
   # for Perl 5.6.x
-  ppm install --location=. Wx[-dev]-0.18
+  ppm install --location=. Wx[-dev]-0.20
   # for Perl 5.8.x
-  ppm install Wx[-dev]-0.18.ppd
+  ppm install Wx[-dev]-0.20.ppd
 
 Have fun!
 Mattia
