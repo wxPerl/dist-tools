@@ -2,7 +2,7 @@
 
 set DIR=c:\Developement\wxWindows\main\wxWindows-2.4
 set RET=c:\Developement\wxPerl\dist-tools
-set ZIPFILE=c:\Developement\wxPerl\data\wxWindows-2.4.1b2.zip
+set ZIPFILE=c:\Developement\wxPerl\data\wxWindows-2.4.2.zip
 
 cd %DIR%
 

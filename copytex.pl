@@ -8,7 +8,7 @@ use File::Basename;
 use WxInfo;
 
 my( $pattern, $dest ) = @ARGV;
-my $wxperl = 'C:/Developement/wxPerl/wxPerl-0.13';
+my $wxperl = 'C:/Developement/wxPerl/wxPerl';
 use vars qw(%pl_classes %pl_funcs %pl_inheritance);
 
 scan_wxperl();
