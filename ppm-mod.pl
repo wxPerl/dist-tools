@@ -22,7 +22,8 @@ check_file( $package_src );
 my $package_directory = basename( $package_src );
 $package_directory =~ s/\.(tar\.gz|zip|tgz)$//;
 my $package_base = $package_directory; $package_base =~ s/\-[\d\.]+$//;
-my $destination_dir = catdir( $FindBin::RealBin, '..', 'modules' );
+my $destination_dir = catdir( $FindBin::RealBin, '..',
+                              'modules', Wx->VERSION );
 
 my $wx_version = join '.',
                  map { eval "$_ + 0" }
@@ -30,12 +31,12 @@ my $wx_version = join '.',
                  [0 .. 2];
 my $wxperl_version = Wx->VERSION;
 my $package_build = catdir( $temp_dir, $package_directory );
-my $package_ppm_suffix = ( Wx::wxUNICODE() ? 'u' : '' )
+my $package_ppm_suffix = ( Wx::wxUNICODE() ? '-u' : '' )
                        . "-$Config{version}";
 my $package_ppd = "${package_base}.ppd";
 my $package_ppm = "${package_base}-ppm.tar.gz";
 my $package_ppm_archive = "${package_directory}-wxperl${wxperl_version}-" .
-                "wxmsw${wx_version}-${package_ppm_suffix}.zip";
+                "wxmsw${wx_version}${package_ppm_suffix}.zip";
 
 check_files();
 package_source();
@@ -84,6 +85,9 @@ sub package_ppm {
   for my $data ( [ $package_ppd, $package_ppm ] ) {
       my( $ppd, $pack ) = @$data;
       my_system qq{perl -i.bak -p -e "s#<CODEBASE\\s+HREF=\\"\\S*\\"\\s+/>#<CODEBASE HREF=\\"${pack}\\" />#;" $ppd};
+      if( $] >= 5.008 ) {
+          my_system qq{perl -i.bak -p -e "s#-multi-thread#-multi-thread-5.8#;" $ppd};
+      }
   }
   my_system "zip -0 $destination_dir/${package_ppm_archive} $package_ppm $package_ppd";
 }
