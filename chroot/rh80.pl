@@ -22,6 +22,6 @@ gtk+-devel gtk+ glib-devel glib zlib-devel
 libpng libpng-devel libjpeg libjpeg-devel libtiff libtiff-devel
 RPMS
 $chroot = '/home/mbarbon/chroot/rh80';
-my @rpmpath_80 = ( '/cdrom/RedHat/RPMS', '/scratch/redhat/rh80/cd2' );
+my @rpmpath_80 = ( '/cdrom_2/RedHat/RPMS', '/scratch/redhat/rh80/cd2' );
 $rpms = $rpms_80;
 @rpmpath = @rpmpath_80;

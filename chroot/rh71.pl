@@ -18,6 +18,6 @@ libpng libpng-devel libjpeg libjpeg-devel libtiff libtiff-devel
 --nodeps Mesa Mesa-devel
 RPMS
 $chroot = '/home/mbarbon/chroot/rh71';
-my @rpmpath_71 = ( '/cdrom/rh71/RPMS' );
+my @rpmpath_71 = ( '/cdrom_2/rh71/RPMS' );
 $rpms = $rpms_71;
 @rpmpath = @rpmpath_71;
