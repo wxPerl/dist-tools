@@ -9,6 +9,14 @@ use DistConfig;
 use DistUtils;
 use File::Spec::Functions qw(catdir updir catfile);
 
+my( @configs ) = ( @ARGV );
+my $dc = DistConfig->new( $configs[0], '' );
+
+my $wxperl_version = $dc->wxperl_version;
+my $wxperl_src = $dc->wxperl_src;
+my $distribution_dir = $dc->distribution_dir;
+my $temp_dir = $dc->temp_dir;
+my $wxperl_directory = $dc->wxperl_directory;
 my $wxperl_samples = "wxPerl-${wxperl_version}-samples.zip";
 
 # copy source to the release dir...
