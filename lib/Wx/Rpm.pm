@@ -9,66 +9,9 @@ use DistConfig ();
 use File::Basename qw(basename dirname);
 use Text::Template;
 use File::Temp;
-use Net::SCP qw();
-use Net::SSH qw(ssh);
-
-my $ssh = 'C:\\Programmi\\Utility\\Cygwin\\bin\\ssh.exe';
-my $scp = 'C:\\Programmi\\Utility\\Cygwin\\bin\\scp.exe';
-
-$Net::SSH::ssh = $ssh;
-$Net::SCP::scp = $scp;
-# $Net::SCP::DEBUG = 1;
 
 sub catfile { File::Spec::Unix->catfile( @_ ) }
 sub catdir { File::Spec::Unix->catdir( @_ ) }
-
-sub new {
-    my $class = shift;
-
-    return bless { }, $class;
-}
-
-sub _put_file {
-    my( $self, $file, $name ) = @_;
-    my $scp = Net::SCP->new( $self->_distconfig->remote_host,
-                             $self->_distconfig->remote_user ) or die $!;
-
-    $file =~ s!^(\w):!/cygdrive/$1!; $file =~ tr!\\!/!;
-    $scp->put( $file, $name ) or die $scp->{errstr};
-}
-
-sub _get_file {
-    my( $self, $file, $name ) = @_;
-    my $scp = Net::SCP->new( $self->_distconfig->remote_host,
-                             $self->_distconfig->remote_user ) or die $!;
-
-    $name =~ s!^(\w):!/cygdrive/$1!; $name =~ tr!\\!/!;
-    $scp->get( $file, $name ) or die $scp->{errstr};
-}
-
-sub _put_string {
-    my( $self, $string, $name ) = @_;
-    my $tmp = File::Temp->new( SUFFIX => '.sh' );
-    binmode $tmp;
-
-    print $tmp $string;
-    $self->_put_file( $tmp->filename, $name );
-}
-
-sub _exec_string {
-    my( $self, $string ) = @_;
-    $self->_put_string( $string, 'tmp.sh' );
-
-    ssh( ( sprintf "%s\@%s", $self->_distconfig->remote_user,
-                             $self->_distconfig->remote_host ),
-         'sh', 'tmp.sh' );
-}
-
-sub _exec_command {
-    my( $self, $host, $user, @data ) = @_;
-
-    ssh( "$user\@$host", @data );
-}
 
 sub set_options {
     my( $self, %args ) = @_;
@@ -189,7 +132,6 @@ $ccache
 $functions
 
 export DISPLAY=192.168.9.2:0.0
-dname=wxWin
 export wxgtk_directory=$wxgtk_directory
 SRC=../SOURCES
 

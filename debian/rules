@@ -1,11 +1,6 @@
 #!/usr/bin/make -f
 # -*- Makefile -*-
 
-WX_VER:=$(shell wx-config --version | perl -p -e 'chomp;s/\.\d+$$//;')
-DH_OPTIONS=-plibwx-perl-wxgtk$(WX_VER)
-export DH_OPTIONS
-WXPERL_DIR=$(shell dh_listpackages $(DH_OPTIONS) | tr -d '\n')
-
 binary: binary-arch binary-indep
 
 binary-arch: build install
@@ -35,7 +30,7 @@ build-stamp:
 
 install-stamp:
 	dh_testdir Wx.pm
-	$(MAKE) install PREFIX=$(CURDIR)/debian/$(WXPERL_DIR)/usr
+	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr
 	dh_strip
 	touch install-stamp
 

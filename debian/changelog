@@ -1,8 +1,8 @@
-libwx-perl (0.21-1) unstable; urgency=low
+libwx-perl (0.22-1) unstable; urgency=low
 
   * New upstream version
 
- -- Mattia Barbon <mattia.barbon@libero.it>  Thu, 30 Dic 2004 17:23:55 +0100
+ -- Mattia Barbon <mattia.barbon@libero.it>  Sat, 22 Jan 2005 18:10:55 +0100
 
 libwx-perl (0.12-1) unstable; urgency=low
 
