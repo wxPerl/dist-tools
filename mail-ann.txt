@@ -1,4 +1,4 @@
-Subject: [ANNOUNCE] wxPerl 0.18
+Subject: [ANNOUNCE] wxPerl 0.19
 
 A new version of wxPerl, the Perl bindings to wxWindows, is out!
 
@@ -10,10 +10,14 @@ Linux are available along with documentation in HTML and MS HTML Help
 format from http://wxperl.sourceforge.net/download.html
 
 Changes since the last release:
-	- Corrected handling of UTF-8 encoded strings in ANSI builds.
-	- Added wxGridTableMessage.
-	- Fixed build problems with GTK 2 and/or Unicode on
-	  Unix hosts.
+	- Started wxHtmlParser/wxHtmlTag/custom tag handlers
+	  wrapping.
+	- Mac OS X build now installs the 'wxPerl' binary in perl
+	  bin directory.
+	- wxDatagramSocket and wxSockAddress.
+	- wxNumberEntryDialog. (2.5)
+	- wxGridBagSizer. (2.5)
+	- wxListbook. (2.5)
 
 Regards
 Mattia
