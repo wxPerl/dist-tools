@@ -1,0 +1,23 @@
+Subject: [ANNOUNCE] wxPerl 0.13
+
+A new version of wxPerl, the Perl bindings to wxWindows, is out!
+
+You can download the source from CPAN.
+
+Binary packages for ActivePerl/Win32 6xx and 9xx builds, and Red Hat
+Linux are available along with documentation in HTML and MS HTML Help
+format from http://wxperl.sourceforge.net/
+
+Changes since the last version:
+	- new DEPRECATIONS section in README.txt, please read it
+	- New build system, allows building wxPerl extension written using
+	  XS outside of the wxPerl tree.
+	- Added Wx::Wave
+	- Added Wx::MemoryFSHandler
+	- Added Wx::Perl::Carp (thanks to podmaster).
+	- Mac OS X support (requires wxWindows 2.4.0 or newer).
+	- Added Wx::Socket* (thanks to Graciliano M. P.)
+
+Regards
+Mattia
+

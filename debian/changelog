@@ -1,0 +1,35 @@
+libwx-perl (0.12-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Mattia Barbon <mbarbon@dsi.unive.it>  Tue,  3 Sep 2002 17:23:55 +0200
+
+libwx-perl (0.11-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Mattia Barbon <mbarbon@dsi.unive.it>  Tue,  4 Jun 2002 11:09:41 +0200
+
+libwx-perl (0.10-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Mattia Barbon <mbarbon@dsi.unive.it>  Sun, 03 Mar 2002 19:48:55 +0100
+
+libwx-perl (0.09-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Mattia Barbon <mbarbon@dsi.unive.it>  Wed, 20 Feb 2002 18:23:33 +0100
+
+libwx-perl (0.08-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Mattia Barbon <mbarbon@dsi.unive.it>  Fri, 23 Nov 2001 17:35:12 +0100
+
+libwx-perl (0.07-1) unstable; urgency=low
+
+  * Initial packaging.
+
+ -- Mattia Barbon <mbarbon@dsi.unive.it>  Fri,  6 Jul 2001 13:01:10 +0200

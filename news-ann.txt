@@ -1,0 +1,32 @@
+Subject: [ANNOUNCE] wxPerl 0.13
+
+A new version of wxPerl, the Perl bindings to wxWindows, is out!
+
+wxWindows is a free and cross platform (Windows/Motif/GTK/Mac) C++ GUI
+toolkit with native look and feel.  (visit http://www.wxwindows.org/
+for details).
+
+You can download wxPerl sources from
+$CPAN/authors/id/M/MB/MBARBON/Wx-0.13.tar.gz;
+
+Binary packages for ActivePerl/Win32 6xx builds and Red Hat Linux are
+available along with documentation in HTML and MS HTML Help format
+from http://wxperl.sourceforge.net/
+
+The project home page is http://wxperl.sourceforge.net/. There is also
+a mailing list dedicated to wxPerl users:
+wxperl-users@lists.sourceforge.net
+
+Changes since the last version:
+	- new DEPRECATIONS section in README.txt, please read it
+	- New build system, allows building wxPerl extension written using
+	  XS outside of the wxPerl tree.
+	- Added Wx::Wave
+	- Added Wx::MemoryFSHandler
+	- Added Wx::Perl::Carp (thanks to podmaster).
+	- Mac OS X support (requires wxWindows 2.4.0 or newer).
+	- Added Wx::Socket* (thanks to Graciliano M. P.)
+
+Regards
+Mattia
+

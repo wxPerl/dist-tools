@@ -1,0 +1,57 @@
+#!/usr/bin/make -f
+# -*- Makefile -*-
+
+# MBN: this whole makefile is tailored to _MY_ environment
+# so it will not let you build both libwx-perl-wxgtk2.[23]
+# at once ( and thus it is not suitable for autobuilders, etc )
+# but since I am not a Debian developer, everything should be fine
+WX_VER:=$(shell wx-config --version | perl -p -e 'chomp;s/\.\d+$$//;')
+DH_OPTIONS=-plibwx-perl-wxgtk$(WX_VER)
+export DH_OPTIONS
+WXPERL_DIR=$(shell if test "$(WX_VER)" = "2.2"; then echo tmp; else dh_listpackages $(DH_OPTIONS); fi | tr -d '\n')
+ifeq ($(STATIC),1)
+STATIC_FLAG=--static
+endif
+
+binary: binary-arch binary-indep
+
+binary-arch: build install
+	dh_testdir Wx.pm
+	dh_testroot
+	dh_installchangelogs Changes
+	dh_installdocs README.txt
+	dh_fixperms
+	dh_compress
+	dh_installdeb
+	dh_perl
+	dh_shlibdeps
+	dh_gencontrol
+	dh_builddeb
+
+binary-indep:
+
+build: build-stamp
+install: install-stamp
+
+build-stamp:
+	dh_testdir Wx.pm
+	perl Makefile.PL $(STATIC_FLAG) INSTALLDIRS=vendor
+	$(MAKE) OPTIMIZE="-O2 -g -Wall -Wno-unused"
+	if test "$$DISPLAY" != ""; then make test; fi
+	touch build-stamp
+
+install-stamp:
+	dh_testdir Wx.pm
+	$(MAKE) install PREFIX=$(CURDIR)/debian/$(WXPERL_DIR)/usr
+	dh_strip
+	touch install-stamp
+
+clean:
+	dh_testdir Wx.pm
+	dh_testroot
+	rm -f build-stamp install-stamp
+	if [ -e Makefile ]; then $(MAKE) -i distclean; fi
+	dh_clean
+
+.PHONY: binary binary-arch binary-indep clean
+
