@@ -72,7 +72,7 @@ sub wxwindows_source {
 sub wxwindows_dll {
   $ENV{WXDIR} = $wxmsw_build;
   $ENV{WXWIN} = $wxmsw_build;
-  my $uc = $wxperl_unicode ? ' UNICODE=1' : ' ';
+  my $uc = $wxperl_unicode ? ' UNICODE=1' : ' UNICODE=0';
   my_chdir catdir( $wxmsw_build, 'src', 'msw' );
   my_system "make -f makefile.g95 all$uc WXMAKINGDLL=1 FINAL=1";
   if( is_wx23 ) {
