@@ -22,7 +22,8 @@ use vars qw(@EXPORT);
              $chroot_user $chroot_group $chroot_home $deb_chroot_dir
              @wxmsw_archives $wxperl_number $wxperl_static $wxgtk_archive
              $wxgtk_src $wxwin_number $wxgtk_directory $wxmsw_directory
-             $rh_ccache $deb_ccache $wxperl_unicode);
+             $rh_ccache $deb_ccache $wxperl_unicode $wxmac_src
+             $wxmac_directory $wxmac_archive);
 
 use vars  qw($wxperl_src $wxperl_version $wxperl_directory $wxmsw_src $temp_dir
              $distribution_dir $data_dir $wxwin_version $contrib_makefiles
@@ -30,7 +31,8 @@ use vars  qw($wxperl_src $wxperl_version $wxperl_directory $wxmsw_src $temp_dir
              $chroot_user $chroot_group $chroot_home $deb_chroot_dir
              @wxmsw_archives $wxperl_number $wxperl_static $wxgtk_archive
              $wxgtk_src $wxwin_number $wxgtk_directory $wxmsw_directory
-             $rh_ccache $deb_ccache $wxperl_unicode);
+             $rh_ccache $deb_ccache $wxperl_unicode
+             $wxmac_src $wxmac_directory $wxmac_archive);
 
 my $ini = new Config::IniFiles( -file => catfile( $FindBin::RealBin,
                                                   'config.ini' ) );
@@ -41,6 +43,7 @@ die "Specified section '$distrib' does not exist"
 
 my $msw = v( $distrib, 'wxmsw' );
 my $gtk = v( $distrib, 'wxgtk' );
+my $mac = v( $distrib, 'wxmac' );
 
 my $wx_data_dir = v( 'Directories', "data-$^O" );
 
@@ -78,6 +81,11 @@ $wxgtk_archive = v( $gtk, 'archive' ) || '';
 $wxgtk_src = length( $wxgtk_archive ) ?
   catfile( $wx_data_dir, $wxgtk_archive ) : '';
 $wxgtk_directory = v( $gtk, 'directory' ) || '';
+
+$wxmac_archive = v( $mac, 'archive' ) || '';
+$wxmac_src = length( $wxmac_archive ) ?
+  catfile( $wx_data_dir, $wxmac_archive ) : '';
+$wxmac_directory = v( $mac, 'directory' ) || '';
 
 $chroot_user = v( 'RedHat', 'user' );
 $chroot_group = v( 'RedHat', 'group' );

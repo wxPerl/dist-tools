@@ -5,11 +5,15 @@ use base qw(Exporter);
 use vars qw(@EXPORT);
 use Carp;
 
-@EXPORT = qw(my_chdir my_system catdir catfile updir
+@EXPORT = qw(my_chdir my_system my_unlink catdir catfile updir
              is_wx23 is_wx22 extract);
 
 sub my_chdir($) {
   chdir $_[0] or croak "chdir '$_[0]': $!";
+}
+
+sub my_unlink($) {
+  unlink $_[0] or croak "unlink '$_[0]': $!";
 }
 
 sub my_system {
