@@ -18,9 +18,65 @@ sub new {
   return $this;
 }
 
+sub do_scan_xs {
+  my $this = shift;
+  my( $pl_classes, $pl_funcs, $pl_inheritance ) =
+    @{$this}{'CLASSES','FUNCTIONS','INHERITANCE'};
+
+  my $fh = shift;
+  my( $package, $pl_package );
+
+  while( <IN> ) {
+    m/PACKAGE=([\w\:]+)/ and do {
+      my $pl_package = $package = $1;
+      $package =~ s/^Wx::/wx/;
+      ${$pl_classes}{$package} = $pl_package;
+      next;
+    };
+    m/INCLUDE:\s+(.*)\|\s*$/ and do {
+      my $cmd = $1;
+
+      local *IN;
+      open IN, $cmd . ' |';
+      do_scan_xs( $this, \*IN );
+      next;
+    };
+    m/^([\w\:]+)\(/ and do {
+      ( my $m = $1 ) =~ s/^.*:://;
+      my $pl_method = "${pl_package}::${m}";
+
+      $m = $package if $m eq 'new';
+      my $method = "${package}::${m}";
+
+      ${$pl_funcs}{$method} = $pl_method;
+      next;
+    };
+
+    # added by BKE (bke@bkecc.com) - 09/02/2003
+    m/I\(\s*(.+?),\s*(.+?)\s*\)/ and do {
+
+      # the conditional part of conditional inheritance is not
+      # taken into account
+      # for example:
+      #     #if HAS_TLW
+      #         I( Dialog,          TopLevelWindow )
+      #      #else
+      #        I( Dialog,          Panel )
+      #     #endif
+      # currently means that as far as WxInfo is concerned Dialog
+      # inherits from both TopLevelWindow and Panel.
+      # Is this a major problem?
+
+      # used a hash to avoid duplicate entries
+      ${$pl_inheritance}{$1}->{$2}++;
+    };
+  }
+}
+
 sub _scan_source {
   my $this = shift;
-  my( $pl_classes, $pl_funcs, $pl_inheritance ) = @{$this}{'CLASSES','FUNCTIONS','INHERITANCE'};
+  my( $pl_classes, $pl_funcs, $pl_inheritance ) =
+    @{$this}{'CLASSES','FUNCTIONS','INHERITANCE'};
 
   my $wanted = sub {
     if( -d $_ && m{^(?:demo|build)$} ) {
@@ -54,43 +110,7 @@ sub _scan_source {
         };
       }
     } elsif ( m/\.xs$/ ) {
-      my( $package, $pl_package );
-
-      while( <IN> ) {
-        m/PACKAGE=([\w\:]+)/ and do {
-          my $pl_package = $package = $1;
-          $package =~ s/^Wx::/wx/;
-          ${$pl_classes}{$package} = $pl_package;
-          next;
-        };
-        m/^([\w\:]+)\(/ and do {
-          ( my $m = $1 ) =~ s/^.*:://;
-          my $pl_method = "${pl_package}::${m}";
-
-          $m = $package if $m eq 'new';
-          my $method = "${package}::${m}";
-
-          ${$pl_funcs}{$method} = $pl_method;
-          next;
-        };
-
-        # added by BKE (bke@bkecc.com) - 09/02/2003
-        m/I\(\s*(.+?),\s*(.+?)\s*\)/ and do {
-
-          # the conditional part of conditional inheritance is not taken into account
-          # for example:
-          #     #if HAS_TLW
-          #         I( Dialog,          TopLevelWindow )
-          #      #else
-          #        I( Dialog,          Panel )
-          #     #endif
-          # currently means that as far as WxInfo is concerned Dialog inherits from both TopLevelWindow and Panel.
-          # Is this a major problem?
-
-          # used a hash to avoid duplicate entries
-          ${$pl_inheritance}{$1}->{$2}++;
-        };
-      }
+      do_scan_xs( $this, \*IN );
     }
   };
 
