@@ -92,7 +92,9 @@ sub build_wxwidgets {
             extract( $dc->wxmsw_src,
                      "$wad/contrib/*", "$wad/src/*", "$wad/lib/*",
                      "$wad/include/*", "$wad/art/*",
-                     ( is_wx25( $dc ) ? "$wad/build/*" : () ) );
+                     ( is_wx25( $dc ) ? ( "$wad/build/*",
+                                          "$wad/samples/minimal/*",
+                                          "$wad/samples/sample.*" ) : () ) );
             my_system "mv $wad/* .";
             my_system "rmdir $wad";
         } else {
@@ -156,7 +158,14 @@ sub build_wxperl {
     # build wxPerl
     local $ENV{WXDIR} = $self->wxmsw_build;
     local $ENV{WXWIN} = $self->wxmsw_build;
-    local $ENV{PATH} = catdir( $self->wxmsw_build, 'lib' ) . ';' . $ENV{PATH};
+    my $np;
+    if( is_wx25( $dc ) ) {
+        $np = catdir( $self->wxmsw_build, 'lib', 'gcc_dll' ) . ';'
+              . $ENV{PATH};
+    } else {
+        $np = catdir( $self->wxmsw_build, 'lib' ) . ';' . $ENV{PATH};
+    }
+    local $ENV{PATH} = $np;
     my $uc = $dc->wxperl_unicode ? ' --unicode --mslu' : ' ';
     my_chdir $self->wxperl_build;
     my_system "perl -MConfig_m Makefile.PL$uc ";
