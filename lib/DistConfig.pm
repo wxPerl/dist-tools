@@ -3,8 +3,8 @@ package DistConfig;
 use strict;
 
 #####
-my $distrib = shift @ARGV;#'wxPerl-0.12b2-2.3.3';
-#my $distrib = 'wxPerl-0.12b3-2.4.0b1-snap-static';
+use vars '$distrib';
+$distrib = shift @ARGV unless $distrib;
 #####
 
 use DistUtils qw(catfile catdir);
