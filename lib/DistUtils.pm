@@ -28,14 +28,10 @@ sub my_system {
   $ret and croak "system: $cmd";
 }
 
-#sub catfile { File::Spec->catfile( @_ ) }
-#sub catdir { File::Spec->catdir( @_ ) }
-#sub updir { File::Spec->updir( @_ ) }
-
-sub is_wx24() { die unless $DistConfig::wxwin_version;
-                $DistConfig::wxwin_version =~ m/^2.4/ }
-sub is_wx25() { die unless $DistConfig::wxwin_version;
-                $DistConfig::wxwin_version =~ m/^2.5/ }
+sub is_wx24($) { die unless $_[0]->wxwin_version;
+                 $_[0]->wxwin_version =~ m/^2.4/ }
+sub is_wx25($) { die unless $_[0]->wxwin_version;
+                 $_[0]->wxwin_version =~ m/^2.5/ }
 
 sub extract {
   my $archive = shift;

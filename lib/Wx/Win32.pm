@@ -2,11 +2,13 @@ package Wx::Win32;
 
 use strict;
 use warnings;
-use DistUtils qw(extract my_chdir check_file my_system is_wx24);
+use base 'Wx::Base';
+use DistUtils qw(extract my_chdir check_file my_system is_wx24 is_wx25);
 use File::Spec::Functions qw(catdir updir);
 use File::Basename qw(basename dirname);
 use File::Path qw(mkpath rmtree);
-use DistConfig ();
+use DistConfig;
+use Text::Template;
 use Config;
 
 sub _fix_ppd {
@@ -26,7 +28,7 @@ sub new {
 sub set_options {
     my( $self, %args ) = @_;
 
-    my $distconfig = DistConfig->new( $args{config} );
+    my $distconfig = DistConfig->new( $args{config}, '' );
 
     $self->{distconfig} = $distconfig;
 
@@ -89,8 +91,8 @@ sub build_wxwidgets {
         if( length $wad ) {
             extract( $dc->wxmsw_src,
                      "$wad/contrib/*", "$wad/src/*", "$wad/lib/*",
-                     "$wad/include/*" );
-            extract( $dc->wxmsw_src, "$wad/art/*" );
+                     "$wad/include/*", "$wad/art/*",
+                     ( is_wx25( $dc ) ? "$wad/build/*" : () ) );
             my_system "mv $wad/* .";
             my_system "rmdir $wad";
         } else {
@@ -112,15 +114,29 @@ sub build_wxwidgets {
         local $ENV{WXWIN} = $self->wxmsw_build;
         my $opt = $dc->wxperl_unicode ? ' UNICODE=1 MSLU=1' :
                                         ' UNICODE=0 MSLU=0';
-        $opt .= ' FINAL=1 CXXFLAGS=-Os';
-        my_chdir catdir( $self->wxmsw_build, 'src', 'msw' );
-        my_system "make -f makefile.g95 all$opt WXMAKINGDLL=1";
-        if( is_wx24 ) {
+        my $makefile;
+
+        if( is_wx25( $dc ) ) {
+            $opt .= ' BUILD=release CXXFLAGS=" -Os -DNO_GCC_PRAGMA " SHARED=1';
+            $makefile = 'makefile.gcc';
+            my_chdir catdir( $self->wxmsw_build, 'build', 'msw' );
+        } else {
+            $opt .= ' FINAL=1 CXXFLAGS=-Os WXMAKINGDLL=1';
+            $makefile = 'makefile.g95';
+            my_chdir catdir( $self->wxmsw_build, 'src', 'msw' );
+        }
+        my_system "make -f $makefile all$opt";
+        if( is_wx24( $dc ) ) {
             my_chdir catdir( $self->wxmsw_build, 'contrib', 'src', 'xrc' );
             my_system "make -f makefile.g95 all$opt WXUSINGDLL=1";
         }
-        my_chdir catdir( $self->wxmsw_build, 'contrib', 'src', 'stc' );
-        my_system "make -f makefile.g95 all$opt WXUSINGDLL=1";
+        if( is_wx25( $dc ) ) {
+            my_chdir catdir( $self->wxmsw_build, 'contrib', 'build', 'stc' );
+        } else {
+            my_chdir catdir( $self->wxmsw_build, 'contrib', 'src', 'stc' );
+        }
+        # fine (if ugly) for both 2.4 and 2.5
+        my_system "make -f $makefile all$opt WXUSINGDLL=1";
 
         my_chdir $dc->temp_dir;
         my_system "tar cf - wxMSW | gzip -9 > $archive";
@@ -150,6 +166,26 @@ sub build_wxperl {
 sub package_wxwidgets {
 }
 
+sub _fill_readme {
+    my( $self, $is_dev ) = @_;
+    my $package = 'Wx' . ( $is_dev ? '-dev' : '' ) . '-' .
+      $self->_distconfig->wxperl_version;
+    my $data_dir = $self->_distconfig->data_dir;
+
+    unlink 'README.txt';
+
+    my $tmpl = Text::Template->new( TYPE       => 'FILE',
+                                    SOURCE     => "$data_dir/README.txt",
+                                    DELIMITERS => [ '<%', '%>' ] );
+
+    open my $readme_fh, "> README.txt";
+    die "Error while filling template: $Text::Template::ERROR"
+      unless $tmpl->fill_in( OUTPUT => $readme_fh,
+                             HASH => { package => $package,
+                                     } );
+    close $readme_fh;
+}
+
 sub package_wxperl {
     my $self = shift;
     my $dc = $self->_distconfig;
@@ -161,8 +197,6 @@ sub package_wxperl {
     for my $data ( [ $self->wxperl_ppd, $self->wxperl_ppm ],
                    [ $self->wxperl_dev_ppd, $self->wxperl_dev_ppm ] ) {
         _fix_ppd( @$data );
-#      my( $ppd, $pack ) = @$data;
-#      my_system qq{perl -i.bak -p -e "s#<CODEBASE\\s+HREF=\\"\\S+\\"\\s+/>#<CODEBASE HREF=\\"${pack}\\" />#;" $ppd};
     }
     my $wxperl_version = $dc->wxperl_version;
     my $wxperl_ppm = $self->wxperl_ppm;
@@ -174,11 +208,12 @@ sub package_wxperl {
     my $wxperl_dev_ppm = $self->wxperl_dev_ppm;
     my $wxperl_dev_ppd = $self->wxperl_dev_ppd;
 
+    $self->_fill_readme( 0 );
     my_system "mv Wx-${wxperl_version}-ppm.tar.gz $wxperl_ppm";
-    my_system "cp -f $data_dir/README.txt .";
     my_system "zip -0 $distribution_dir/${wxperl_ppm_archive} $wxperl_ppm $wxperl_ppd README.txt";
+
+    $self->_fill_readme( 1 );
     my_system "mv Wx-dev-${wxperl_version}-ppm.tar.gz $wxperl_dev_ppm";
-    my_system "cp -f $data_dir/README.txt .";
     my_system "zip -0 $distribution_dir/${wxperl_dev_ppm_archive} $wxperl_dev_ppm $wxperl_dev_ppd README.txt";
 }
 
@@ -258,21 +293,6 @@ sub build_submodules {
 }
 
 sub make_dist {
-}
-
-sub _distconfig { $_[0]->{distconfig} }
-
-our $AUTOLOAD;
-
-sub AUTOLOAD {
-    die $AUTOLOAD, ' ', $_[0] unless ref $_[0];
-    my $name = $AUTOLOAD; $name =~ s/.*:://;
-    return if $name eq 'DESTROY';
-    die $name unless exists $_[0]->{$name};
-
-    no strict 'refs';
-    *$AUTOLOAD = sub { $_[0]->{$name} };
-    goto &$AUTOLOAD;
 }
 
 1;

@@ -25,10 +25,14 @@ sub do_scan_xs {
 
   my $fh = shift;
   my( $package, $pl_package );
+  my $module_seen = 0;
 
-  while( <IN> ) {
+  while( <$fh> ) {
+    $module_seen = $module_seen || m/^MODULE=/;
+    next unless $module_seen;
+
     m/PACKAGE=([\w\:]+)/ and do {
-      my $pl_package = $package = $1;
+      $pl_package = $package = $1;
       $package =~ s/^Wx::/wx/;
       ${$pl_classes}{$package} = $pl_package;
       next;
@@ -36,9 +40,8 @@ sub do_scan_xs {
     m/INCLUDE:\s+(.*)\|\s*$/ and do {
       my $cmd = $1;
 
-      local *IN;
-      open IN, $cmd . ' |';
-      do_scan_xs( $this, \*IN );
+      open my $in, $cmd . ' |';
+      do_scan_xs( $this, $in );
       next;
     };
     m/^([\w\:]+)\(/ and do {
@@ -88,15 +91,14 @@ sub _scan_source {
     return unless -f $_;
     return unless m/\.xs$|\.pm$/i;
 
-    local *IN;
-    open IN, "< $_";
+    open my $in, "< $_";
 
     if( m/\.pm$/ ) {
       my( $package, $pl_package );
 
-      while( <IN> ) {
-        m/^package\s+([\w\:]+)\;/ and do {
-          my $pl_package = $package = $1;
+      while( <$in> ) {
+        m/^package\s+([\w\:]+)\s*\;/ and do {
+          $pl_package = $package = $1;
           $package =~ s/^Wx::/wx/;
           ${$pl_classes}{$package} = $pl_package;
           next;
@@ -110,7 +112,7 @@ sub _scan_source {
         };
       }
     } elsif ( m/\.xs$/ ) {
-      do_scan_xs( $this, \*IN );
+      do_scan_xs( $this, $in );
     }
   };
 
@@ -136,7 +138,7 @@ sub get_methods {
 sub get_inheritance {
   my $this = shift;
   $this->_scan_source unless $this->{OK};
-  
+
   for my $class (keys %{$this->{INHERITANCE}}) {
     $this->enumerate_parents($class);
   }

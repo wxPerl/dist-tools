@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use FindBin;
+use IO::Handle;
 use lib "$FindBin::RealBin/lib";
 
 my( $plat, @configs ) = ( shift @ARGV, @ARGV );
