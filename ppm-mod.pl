@@ -30,12 +30,11 @@ my $wx_version = join '.',
                  [0 .. 2];
 my $wxperl_version = Wx->VERSION;
 my $package_build = catdir( $temp_dir, $package_directory );
-my $package_ppm_suffix = 'win32'
-                      . ( Wx::wxUNICODE() ? '-u' : '' )
-                      . "-$Config{version}";
+my $package_ppm_suffix = ( Wx::wxUNICODE() ? 'u' : '' )
+                       . "-$Config{version}";
 my $package_ppd = "${package_base}.ppd";
 my $package_ppm = "${package_base}-ppm.tar.gz";
-my $package_ppm_archive = "${package_directory}-" .
+my $package_ppm_archive = "${package_directory}-wxperl${wxperl_version}-" .
                 "wxmsw${wx_version}-${package_ppm_suffix}.zip";
 
 check_files();
@@ -84,7 +83,7 @@ sub package_ppm {
   # fix archive name
   for my $data ( [ $package_ppd, $package_ppm ] ) {
       my( $ppd, $pack ) = @$data;
-      my_system qq{perl -i.bak -p -e "s#<CODEBASE\\s+HREF=\\"\S*\\"\\s+/>#<CODEBASE HREF=\\"${pack}\\" />#;" $ppd};
+      my_system qq{perl -i.bak -p -e "s#<CODEBASE\\s+HREF=\\"\\S*\\"\\s+/>#<CODEBASE HREF=\\"${pack}\\" />#;" $ppd};
   }
   my_system "zip -0 $destination_dir/${package_ppm_archive} $package_ppm $package_ppd";
 }
