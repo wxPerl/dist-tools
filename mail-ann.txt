@@ -1,6 +1,6 @@
 Subject: [ANNOUNCE] wxPerl 0.21
 
-A new version of wxPerl, the Perl bindings to wxWindows, is out!
+A new version of wxPerl, the Perl bindings to wxWidgets, is out!
 
 You can download the sources from CPAN.
 

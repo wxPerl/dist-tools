@@ -1,9 +1,9 @@
 Subject: [ANNOUNCE] wxPerl 0.21
 
-A new version of wxPerl, the Perl bindings to wxWindows, is out!
+A new version of wxPerl, the Perl bindings to wxWidgets, is out!
 
-wxWindows is a free and cross platform (Windows/Motif/GTK/Mac) C++ GUI
-toolkit with native look and feel.  (visit http://www.wxwindows.org/
+wxWidgets is a free and cross platform (Windows/Motif/GTK/Mac) C++ GUI
+toolkit with native look and feel.  (visit http://www.wxwidgets.org/
 for details).
 
 You can download wxPerl sources from
