@@ -115,7 +115,7 @@ sub build_wxperl {
 
     my_system "perl $wxperl_src_dir/$wxperl_directory/Makefile.PL --mksymlinks"
       . $self->wxperl_configure_flags;
-    my_system "make all";
+    my_system "make all test";
 }
 
 sub package_wxwidgets {
