@@ -17,7 +17,7 @@ libelf rpm rpm-build
 --nodeps glibc-kernheaders
 libgcc binutils cpp glibc-devel libstdc++ libstdc++-devel bison flex
 --nodeps gcc gcc-c++
-XFree86-devel expat fontconfig XFree86-Mesa-libGL XFree86-libs freetype
+XFree86-devel expat fontconfig XFree86-Mesa-libGL XFree86-Mesa-libGLU XFree86-libs freetype
 gtk+-devel gtk+ glib-devel glib zlib-devel
 libpng libpng-devel libjpeg libjpeg-devel libtiff libtiff-devel
 RPMS

@@ -8,12 +8,13 @@ use vars qw($rpms @rpmpath $chroot);
 ###############
 my $user = 'mbarbon';
 my $wxpath = '/scratch/redhat';
-my $wxver = '2.4.0';
+my $wxver = '2.4.2';
 ###################
 # end configuration
 ###################
 
 my $file = shift;
+die "Usage: rhboot.pl distname\n" unless $file;
 do "chroot/$file.pl";
 die unless $chroot;
 
