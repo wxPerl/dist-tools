@@ -1,4 +1,4 @@
-Subject: [ANNOUNCE] wxPerl 0.14
+Subject: [ANNOUNCE] wxPerl 0.16
 
 A new version of wxPerl, the Perl bindings to wxWindows, is out!
 
@@ -7,22 +7,25 @@ toolkit with native look and feel.  (visit http://www.wxwindows.org/
 for details).
 
 You can download wxPerl sources from
-$CPAN/authors/id/M/MB/MBARBON/Wx-0.14.tar.gz;
+$CPAN/authors/id/M/MB/MBARBON/Wx-0.16.tar.gz;
 
+Screenshots: http://wxperl.sourceforge.net/sshot01.html
 Binary packages for ActivePerl/Win32 6xx and 8xx builds, and Red Hat
 Linux are available along with documentation in HTML and MS HTML Help
-format from http://wxperl.sourceforge.net/
+format from http://wxperl.sourceforge.net/download.html
 
 The project home page is http://wxperl.sourceforge.net/. There is also
 a mailing list dedicated to wxPerl users:
 wxperl-users@lists.sourceforge.net
 
-Changes since the last version:
-	- new DEPRECATIONS section in README.txt, please read it
-	- Added Wx::DateTime (not the full interface).
-	- Restored compatibility with perl 5.005.
-	- Internal changes: objects returned by various constructors
-          will not have an additional _WXTHIS key anymore.
+Changes since the last release:
+	- Added Wx::PlGridCellEditor and Wx::PlGridCellRenderer
+	  for custom Wx::Grid cell editing/displaying.
+	- Added Wx::PlGridTable for custom Wx::Grid storage.
+	- Fixed Wx::SocketServer::Accept.
+	- Added Wx::PlXmlResourceHandler, for inserting custom
+	  controls in XRC resources.
+	- wxWindows 2.5 compatibility.
 
 Regards
 Mattia
