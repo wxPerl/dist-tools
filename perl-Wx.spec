@@ -17,7 +17,7 @@ Source: http://prdownload.sourceforge.net/wxperl/Wx-%{full_ver}.tar.gz
 # Patch: Wx-0.08.patch
 Url: http://wxperl.sourceforge.net/
 BuildRoot: %{blr}
-BuildRequires: perl >= 5.006 , wxGTK >= 2.4
+BuildRequires: perl >= 5.006 , wxGTK >= 2.4, wxGTK-devel >= 2.4, gtk+-devel >= 1.2, glib-devel >= 1.2
 Requires: wxGTK >= %{wx_version}
 
 %description
