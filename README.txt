@@ -7,7 +7,7 @@
   # for Perl 5.6.x
   ppm install --location=. Wx
   # for Perl 5.8.x
-  ppm2 install --location=. Wx
+  ppm install Wx.ppd
 
 Have fun!
 Mattia
