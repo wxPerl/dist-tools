@@ -1,4 +1,4 @@
-Subject: [ANNOUNCE] wxPerl 0.19
+Subject: [ANNOUNCE] wxPerl 0.21
 
 A new version of wxPerl, the Perl bindings to wxWindows, is out!
 
@@ -10,14 +10,16 @@ Linux are available along with documentation in HTML and MS HTML Help
 format from http://wxperl.sourceforge.net/download.html
 
 Changes since the last release:
-	- Started wxHtmlParser/wxHtmlTag/custom tag handlers
-	  wrapping.
-	- Mac OS X build now installs the 'wxPerl' binary in perl
-	  bin directory.
-	- wxDatagramSocket and wxSockAddress.
-	- wxNumberEntryDialog. (2.5)
-	- wxGridBagSizer. (2.5)
-	- wxListbook. (2.5)
+	- Fixed installation of 'wxPerl' command on Mac OS X.
+	- Fixed running in the embedded case (still requires the
+	  application to call ExitMainLoop at the right places).
+	- Wrapped wxNavigationKeyEvent.
+	- Using die() in an event handler should not crash anymore
+	  (it might leak).
+	- Added Wx::PlWindow, to be used for custom controls.
+	- New (Windows-only) --mslu flag for Makefile.PL.
+	- Wx::NotebookSizer is now no longer needed and
+	  deprecated.
 
 Regards
 Mattia

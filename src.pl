@@ -7,6 +7,7 @@ use FindBin;
 use lib "$FindBin::RealBin/lib";
 use DistConfig;
 use DistUtils;
+use File::Spec::Functions qw(catdir updir catfile);
 
 my $wxperl_samples = "wxPerl-${wxperl_version}-samples.zip";
 

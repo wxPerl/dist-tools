@@ -1,17 +1,20 @@
 package DistConfig;
 
 use strict;
+use warnings;
 
 #####
 use vars '$distrib';
 $distrib = shift @ARGV unless $distrib;
 #####
 
-use DistUtils qw(catfile catdir);
+#use DistUtils qw(catfile catdir);
 
 require Exporter;
 use FindBin;
 use Config::IniFiles;
+use File::Path qw(mkpath);
+use File::Spec::Functions qw(canonpath catfile catdir);
 
 use base qw(Exporter);
 
@@ -96,10 +99,115 @@ $data_dir = $FindBin::RealBin;
 $rh_rpm_spec = catfile( $data_dir,
                         v( 'RedHat', 'package', ) . '.spec' );
 
-use File::Path qw(mkpath);
-
 mkpath $temp_dir;
 mkpath $distribution_dir;
+
+sub new {
+    my( $class, $distrib ) = @_;
+    my $self = bless { }, __PACKAGE__;
+
+    die "Specified section '$distrib' does not exist"
+      unless $ini->SectionExists( $distrib );
+
+    my $msw = v( $distrib, 'wxmsw' );
+    my $gtk = v( $distrib, 'wxgtk' );
+    my $mac = v( $distrib, 'wxmac' );
+
+    my $wx_data_dir = v( 'Directories', "data-$^O" );
+
+    my $temp_dir = v( 'Directories', "temp-$^O" );
+    my $distribution_dir = v( 'Directories', "dist-$^O" );
+
+    my $rh_chroot_dir = v( 'RedHat', 'chroot' );
+    my $rh_ccache = v( 'RedHat', 'ccache' );
+    my $deb_chroot_dir = v( 'Debian', 'chroot' );
+    my $deb_ccache = v( 'Debian', 'ccache' );
+
+    my $my_wxperl_version = v( $distrib, 'wxperl_version' );
+    ( my $wxperl_number = $my_wxperl_version ) =~ s/[^\d\.].*$//;
+    my $wxperl_version = $my_wxperl_version;
+    my $wxperl_directory = "Wx-${wxperl_number}";
+
+    my $wxperl_doc_dir = v( v( $distrib, 'docs' ), 'doc_dir' );
+    my $wxperl_src = catfile( $wx_data_dir, "Wx-${wxperl_version}.tar.gz" );
+    my $wxperl_unicode = v( $distrib, 'unicode' ) || 0;
+    my $wxwin_version = v( $distrib, 'wxwin_version' );
+    ( my $wxwin_number = $wxwin_version ) =~ s/[^\d\.].*$//;
+
+    $wxwin_number =~ m/^(\d+\.\d+)/; my $td_number = $1;
+    my $contrib_makefiles =
+      catfile( $wx_data_dir, "makefiles-${td_number}.tar.gz" );
+
+    my $wxmsw_src = catfile( $wx_data_dir, v( $msw, 'archive' ) );
+    my $wxmsw_directory = v( $msw, 'directory' ) || '';
+    my @wxmsw_patches = map { $_ ? catfile( $wx_data_dir, $_ ) : () }
+      v( $msw, 'patches' );
+    my @wxmsw_archives = map { $_ ? catfile( $wx_data_dir, $_ ) : () }
+      v( $msw, 'other' );
+
+    my $wxperl_static = v( $gtk, 'static' ) || 0;
+    my $wxgtk_archive = v( $gtk, 'archive' ) || '';
+    my $wxgtk_src = length( $wxgtk_archive ) ?
+      catfile( $wx_data_dir, $wxgtk_archive ) : '';
+    my $wxgtk_directory = v( $gtk, 'directory' ) || '';
+
+    my $wxmac_archive = v( $mac, 'archive' ) || '';
+    my $wxmac_src = length( $wxmac_archive ) ?
+      catfile( $wx_data_dir, $wxmac_archive ) : '';
+    my $wxmac_directory = v( $mac, 'directory' ) || '';
+
+    my $chroot_user = v( 'RedHat', 'user' );
+    my $chroot_group = v( 'RedHat', 'group' );
+    my $chroot_home = v( 'RedHat', 'home' );
+
+    my $data_dir = $FindBin::RealBin;
+
+    my $rh_rpm_spec = catfile( $data_dir,
+                            v( 'RedHat', 'package', ) . '.spec' );
+
+    mkpath $temp_dir;
+    mkpath $distribution_dir;
+
+    @{$self}{qw(wxperl_src wxperl_version wxperl_directory wxmsw_src temp_dir
+             distribution_dir data_dir wxwin_version contrib_makefiles
+             wxmsw_patches wxperl_doc_dir rh_chroot_dir rh_rpm_spec
+             chroot_user chroot_group chroot_home deb_chroot_dir
+             wxmsw_archives wxperl_number wxperl_static wxgtk_archive
+             wxgtk_src wxwin_number wxgtk_directory wxmsw_directory
+             rh_ccache deb_ccache wxperl_unicode wxmac_src
+             wxmac_directory wxmac_archive wx_data_dir)} =
+        ( $wxperl_src, $wxperl_version, $wxperl_directory, $wxmsw_src, $temp_dir,
+          $distribution_dir, $data_dir, $wxwin_version, $contrib_makefiles,
+          \@wxmsw_patches, $wxperl_doc_dir, $rh_chroot_dir, $rh_rpm_spec,
+          $chroot_user, $chroot_group, $chroot_home, $deb_chroot_dir,
+          \@wxmsw_archives, $wxperl_number, $wxperl_static, $wxgtk_archive,
+          $wxgtk_src, $wxwin_number, $wxgtk_directory, $wxmsw_directory,
+          $rh_ccache, $deb_ccache, $wxperl_unicode, $wxmac_src,
+          $wxmac_directory, $wxmac_archive, $wx_data_dir,
+        );
+
+    return $self;
+}
+
+sub get_module_src {
+    my $self = shift;
+
+    return canonpath( catfile( catdir( $self->wx_data_dir, '..', 'modules' ),
+                               $_[0] ) );
+}
+
+our $AUTOLOAD;
+
+sub AUTOLOAD {
+    die $AUTOLOAD, ' ', $_[0] unless ref $_[0];
+    my $name = $AUTOLOAD; $name =~ s/.*:://;
+    return if $name eq 'DESTROY';
+    die $name unless exists $_[0]->{$name};
+
+    no strict 'refs';
+    *$AUTOLOAD = sub { $_[0]->{$name} };
+    goto &$AUTOLOAD;
+}
 
 1;
 

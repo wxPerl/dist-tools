@@ -4,16 +4,19 @@ use strict;
 use base qw(Exporter);
 use vars qw(@EXPORT);
 use Carp;
+use File::Spec::Functions qw(catfile catdir updir);
 
-@EXPORT = qw(my_chdir my_system my_unlink catdir catfile updir
-             is_wx23 is_wx22 extract);
+@EXPORT = qw(my_chdir my_system my_unlink
+             is_wx24 is_wx25 extract check_file check_dir);
 
 sub my_chdir($) {
-  chdir $_[0] or croak "chdir '$_[0]': $!";
+    print "cd $_[0]\n";
+    chdir $_[0] or croak "chdir '$_[0]': $!";
 }
 
 sub my_unlink($) {
-  unlink $_[0] or croak "unlink '$_[0]': $!";
+    print "unlink $_[0]\n";
+    unlink $_[0] or croak "unlink '$_[0]': $!";
 }
 
 sub my_system {
@@ -25,14 +28,14 @@ sub my_system {
   $ret and croak "system: $cmd";
 }
 
-sub catfile { File::Spec->catfile( @_ ) }
-sub catdir { File::Spec->catdir( @_ ) }
-sub updir { File::Spec->updir( @_ ) }
+#sub catfile { File::Spec->catfile( @_ ) }
+#sub catdir { File::Spec->catdir( @_ ) }
+#sub updir { File::Spec->updir( @_ ) }
 
-sub is_wx23() { die unless $DistConfig::wxwin_version;
-                $DistConfig::wxwin_version =~ m/^2.[345]/ }
-sub is_wx22() { die unless $DistConfig::wxwin_version;
-                $DistConfig::wxwin_version =~ m/^2.2/ }
+sub is_wx24() { die unless $DistConfig::wxwin_version;
+                $DistConfig::wxwin_version =~ m/^2.4/ }
+sub is_wx25() { die unless $DistConfig::wxwin_version;
+                $DistConfig::wxwin_version =~ m/^2.5/ }
 
 sub extract {
   my $archive = shift;
@@ -55,6 +58,14 @@ sub extract {
   };
 
   die "Unknown archive '$archive'";
+}
+
+sub check_file($) {
+  die "File not found '$_[0]'" unless -f $_[0];
+}
+
+sub check_dir($) {
+  die "Directory not found '$_[0]'" unless -d $_[0];
 }
 
 1;

@@ -54,10 +54,10 @@ if( $build_wxwindows ) {
     my_chdir "$tmpdir/build/wxWindows";
     my_system "sh $wxwindows_src_dir/$wxmac_directory/configure $wxwindows_configure_flags";
     my_system "make all";
-    my_chdir 'contrib/src/xrc';
+    my_chdir 'contrib/src/stc';
     my_system 'make all';
-    my_chdir '../stc';
-    my_system 'make all';
+#    my_chdir '../stc';
+#    my_system 'make all';
 }
 
 if( $build_wxperl ) {
@@ -84,10 +84,10 @@ if( $build_wxwindows ) {
     my_chdir "$tmpdir/build/wxWindows";
     my_system "rm -rf $tmpdir/install/wxWindows/*";
     my_system "make prefix=$tmpdir/install/wxWindows$prefix install";
-    my_chdir 'contrib/src/xrc';
+    my_chdir 'contrib/src/stc';
     my_system "make prefix=$tmpdir/install/wxWindows$prefix install";
-    my_chdir '../stc';
-    my_system "make prefix=$tmpdir/install/wxWindows$prefix install";
+#    my_chdir '../stc';
+#    my_system "make prefix=$tmpdir/install/wxWindows$prefix install";
 }
 
 if( $build_wxperl ) {
