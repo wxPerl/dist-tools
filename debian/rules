@@ -1,17 +1,10 @@
 #!/usr/bin/make -f
 # -*- Makefile -*-
 
-# MBN: this whole makefile is tailored to _MY_ environment
-# so it will not let you build both libwx-perl-wxgtk2.[23]
-# at once ( and thus it is not suitable for autobuilders, etc )
-# but since I am not a Debian developer, everything should be fine
 WX_VER:=$(shell wx-config --version | perl -p -e 'chomp;s/\.\d+$$//;')
 DH_OPTIONS=-plibwx-perl-wxgtk$(WX_VER)
 export DH_OPTIONS
-WXPERL_DIR=$(shell if test "$(WX_VER)" = "2.2"; then echo tmp; else dh_listpackages $(DH_OPTIONS); fi | tr -d '\n')
-ifeq ($(STATIC),1)
-STATIC_FLAG=--static
-endif
+WXPERL_DIR=$(shell dh_listpackages $(DH_OPTIONS) | tr -d '\n')
 
 binary: binary-arch binary-indep
 
@@ -35,7 +28,7 @@ install: install-stamp
 
 build-stamp:
 	dh_testdir Wx.pm
-	perl Makefile.PL $(STATIC_FLAG) INSTALLDIRS=vendor
+	perl Makefile.PL INSTALLDIRS=vendor
 	$(MAKE) OPTIMIZE="-O2 -g -Wall -Wno-unused"
 	if test "$$DISPLAY" != ""; then make test; fi
 	touch build-stamp
@@ -54,4 +47,3 @@ clean:
 	dh_clean
 
 .PHONY: binary binary-arch binary-indep clean
-
