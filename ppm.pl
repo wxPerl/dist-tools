@@ -17,8 +17,10 @@ my $wxperl_ppm_archive = "Wx-${wxperl_version}-" .
                  "wxmsw${wxwin_version}-${wxperl_ppm_suffix}.zip";
 
 check_files();
-wxwindows_source();
-wxwindows_dll();
+unless( $ENV{NO_BUILD_WX} ) {
+    wxwindows_source();
+    wxwindows_dll();
+}
 wxperl_source();
 wxperl_build();
 wxperl_ppm();
@@ -113,7 +115,9 @@ sub wxperl_ppm {
   unlink 'Wx.ppd';
   my_system 'dmake ppd ppmdist';
   my_system "mv ${wxperl_directory}-ppm.tar.gz $wxperl_ppm";
-  my_system qq{perl -i.bak -p -e "s#<CODEBASE\\s+HREF=\\"\\"\\s+/>#<CODEBASE HREF=\\"${wxperl_ppm}\\" />#;s#\\"$Config{archname}\\"#\\"$real_arch\\"#" Wx.ppd};
+  # remove all dependencies, since ATM they are just compile-time,
+  # and Perl 5.8 PPM (probably correctly) chokes on them
+  my_system qq{perl -i.bak -p -e "s#^\\s*<DEPENDENCY.*/>\$##;s#<CODEBASE\\s+HREF=\\"\\"\\s+/>#<CODEBASE HREF=\\"${wxperl_ppm}\\" />#;s#\\"$Config{archname}\\"#\\"$real_arch\\"#" Wx.ppd};
   my_system "cp -f $data_dir/README.txt .";
   my_system "zip -0 $distribution_dir/${wxperl_ppm_archive} $wxperl_ppm Wx.ppd README.txt";
 }
