@@ -17,8 +17,8 @@ Source: http://prdownload.sourceforge.net/wxperl/Wx-%{full_ver}.tar.gz
 # Patch: Wx-0.08.patch
 Url: http://wxperl.sourceforge.net/
 BuildRoot: %{blr}
-BuildRequires: perl >= 5.006 , wxGTK >= 2.4, wxGTK-devel >= 2.4, gtk+-devel >= 1.2, glib-devel >= 1.2
-Requires: wxGTK >= %{wx_version}
+BuildRequires: perl >= 5.006 , wx-gtk2-unicode-gl >= %{wx_version}, wx-gtk2-unicode-contrib-devel >= %{wx_version}
+Requires: wx-gtk2-unicode-contrib >= %{wx_version}
 
 %description
 wxPerl is a Perl module wrapping the awesome wxWindows library

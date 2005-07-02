@@ -68,6 +68,7 @@ sub package_wxperl {
     my $wxgtk_archive = $dc->wxgtk_archive;
     my $wxwin_number = $dc->wxwin_number;
     my $distribution_dir = $dc->distribution_dir;
+    my $got_contrib = is_wx26( $dc );
 
     $self->_exec_string( <<EOS );
 #!/bin/sh
@@ -84,11 +85,12 @@ EOS
 
     # copy files
     $self->_put_file( $dc->wxperl_src, catfile( $buildarea, 'SOURCES' ) );
-    $self->_put_file( $dc->wxgtk_src, catfile( $buildarea, 'SOURCES' ) );
-    $self->_put_file( $contrib_makefiles, catfile( $buildarea, 'SOURCES' ) );
+    $self->_put_file( $dc->wxgtk_src, catfile( $buildarea, 'SOURCES' ) )
+      unless $got_contrib;
+    $self->_put_file( $contrib_makefiles, catfile( $buildarea, 'SOURCES' ) )
+      unless $got_contrib;
 
     my $makefiles_tgz = basename $contrib_makefiles;
-    my $got_contrib = 0;
 
     # generate spec file / basic sanity checks
     my $out_spec = "$buildarea/SPECS/" . basename( $rpm_spec );
@@ -199,6 +201,9 @@ sub build_submodules {
     my( $self,  @modules ) = @_;
     my $dc = $self->_distconfig;
 
+    my( $rpm_release, $rpm_arch ) = qw(1 i686);
+    my $buildarea = $self->buildarea;
+
     $self->_exec_string( "mkdir -p cpan2rpm" );
     $self->_put_file( $dc->data_dir . "/cpan2rpm/cpan2*",
                       $dc->remote_home . "/cpan2rpm" );
@@ -235,8 +240,8 @@ sudo rpmbuild -ba buildarea/SPECS/$package_nover.spec
 exit 0
 EOT
 
-        my $bin_rpm = "buildarea/RPMS/*/perl-$package-1.i686.rpm";
-        my $src_rpm = "buildarea/SRPMS/perl-$package-1.src.rpm";
+        my $bin_rpm = "$buildarea/RPMS/${rpm_arch}/perl-$package-${rpm_release}.i686.rpm";
+        my $src_rpm = "$buildarea/SRPMS/perl-$package-${rpm_release}.src.rpm";
 
 #        die "something went wrong while building ($bin_rpm) ($src_rpm)"
 #          unless defined( $bin_rpm ) && defined( $src_rpm ) &&
@@ -248,7 +253,9 @@ EOT
         my $wxperl_version = $dc->wxperl_version;
         $bin_final_rpm =~ s/(\.[^\.]+\.rpm)$/_wxperl${wxperl_version}_wxgtk${wxwin_version}${1}/;
 
+        print "$src_rpm => $destination_dir/$src_final_rpm\n";
         $self->_get_file( $src_rpm, "$destination_dir/$src_final_rpm" );
+        print "$bin_rpm $destination_dir/$bin_final_rpm\n";
         $self->_get_file( $bin_rpm, "$destination_dir/$bin_final_rpm" );
     }
 }

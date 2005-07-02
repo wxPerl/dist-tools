@@ -14,8 +14,9 @@ use Config;
 my $buildpkg = "$FindBin::RealBin/mac/buildpkg.py";
 my $builddmg = "$FindBin::RealBin/mac/makedmg";
 my $prefix = "/usr/local";
+my $osx_version = `uname -r` =~ m/^8\./ ? '10.4' : '10.3';
 
-$ENV{MACOSX_DEPLOYMENT_TARGET} = '10.3';
+$ENV{MACOSX_DEPLOYMENT_TARGET} = $osx_version;
 
 sub build_pkg {
     my( $base, $name, $version, $desc, $directory, $rsrc_dir, $destdir ) = @_;
@@ -83,12 +84,20 @@ sub build_wxwidgets {
     my $wxwindows_src_dir = $self->wxwin_src_dir;
     my $tmpdir = $self->_distconfig->temp_dir;
 
+    foreach my $i ( @{$dc->wxmac_patches} ) {
+        check_file $i;
+    }
+
     my_chdir $wxwindows_src_dir;
     extract $dc->wxmac_src;
     foreach my $arch ( @{$dc->wxmac_archives} ) {
         extract $arch;
     }
     my_system "chmod +x $wxwindows_src_dir/$wxmac_directory/distrib/mac/shared-ld-sh" if -f "$wxwindows_src_dir/$wxmac_directory/distrib/mac/shared-ld-sh";
+    my_chdir "$wxwindows_src_dir/$wxmac_directory";
+    foreach my $i ( @{$dc->wxmac_patches} ) {
+        my_system "cat $i | patch -b -p0";
+    }
     my_chdir "$tmpdir/build/wxWidgets";
     my_system "sh $wxwindows_src_dir/$wxmac_directory/configure " .
       $self->wxwin_configure_flags;
@@ -110,6 +119,7 @@ sub build_wxperl {
     extract $dc->wxperl_src;
 
     local $ENV{WX_CONFIG} = "$tmpdir/build/wxWidgets/wx-config --prefix=$wxwindows_src_dir --exec-prefix=$tmpdir/build/wxWidgets";
+    local $ENV{DYLD_LIBRARY_PATH} = "$tmpdir/build/wxWidgets/lib";
 
     my_chdir "$tmpdir/build/wxPerl";
 
@@ -218,7 +228,8 @@ sub make_dist {
     my $self = shift;
     my $dc = $self->_distconfig;
     my $tmpdir = $dc->temp_dir;
-    my $dmg = "wxPerl-" . $dc->wxperl_version .
+    my $dmg = "wxPerl-" . $dc->wxperl_version . '-wxmac' .
+              $dc->wxwin_version . '-osx' . $osx_version .
               ( $dc->wxperl_unicode ? '-u' : '' );
     my $data_dir = $dc->data_dir;
 

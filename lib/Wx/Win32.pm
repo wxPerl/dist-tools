@@ -3,7 +3,7 @@ package Wx::Win32;
 use strict;
 use warnings;
 use base 'Wx::Base';
-use DistUtils qw(extract my_chdir check_file my_system is_wx24 is_wx25);
+use DistUtils qw(extract my_chdir check_file my_system is_wx24 is_wx26);
 use File::Spec::Functions qw(catdir updir);
 use File::Basename qw(basename dirname);
 use File::Path qw(mkpath rmtree);
@@ -92,7 +92,7 @@ sub build_wxwidgets {
             extract( $dc->wxmsw_src,
                      "$wad/contrib/*", "$wad/src/*", "$wad/lib/*",
                      "$wad/include/*", "$wad/art/*",
-                     ( is_wx25( $dc ) ? ( "$wad/build/*",
+                     ( is_wx26( $dc ) ? ( "$wad/build/*",
                                           "$wad/samples/minimal/*",
                                           "$wad/samples/sample.*" ) : () ) );
             my_system "mv $wad/* .";
@@ -118,7 +118,7 @@ sub build_wxwidgets {
                                         ' UNICODE=0 MSLU=0';
         my $makefile;
 
-        if( is_wx25( $dc ) ) {
+        if( is_wx26( $dc ) ) {
             $opt .= ' BUILD=release CXXFLAGS=" -Os -DNO_GCC_PRAGMA " SHARED=1';
             $makefile = 'makefile.gcc';
             my_chdir catdir( $self->wxmsw_build, 'build', 'msw' );
@@ -132,7 +132,7 @@ sub build_wxwidgets {
             my_chdir catdir( $self->wxmsw_build, 'contrib', 'src', 'xrc' );
             my_system "make -f makefile.g95 all$opt WXUSINGDLL=1";
         }
-        if( is_wx25( $dc ) ) {
+        if( is_wx26( $dc ) ) {
             my_chdir catdir( $self->wxmsw_build, 'contrib', 'build', 'stc' );
         } else {
             my_chdir catdir( $self->wxmsw_build, 'contrib', 'src', 'stc' );
@@ -159,7 +159,7 @@ sub build_wxperl {
     local $ENV{WXDIR} = $self->wxmsw_build;
     local $ENV{WXWIN} = $self->wxmsw_build;
     my $np;
-    if( is_wx25( $dc ) ) {
+    if( is_wx26( $dc ) ) {
         $np = catdir( $self->wxmsw_build, 'lib', 'gcc_dll' ) . ';'
               . $ENV{PATH};
     } else {

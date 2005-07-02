@@ -2,8 +2,6 @@ package Wx::Base;
 
 use strict;
 use warnings;
-use Net::SCP qw();
-use Net::SSH qw(ssh);
 use File::Temp;
 
 sub _distconfig { $_[0]->{distconfig} }
@@ -23,10 +21,24 @@ sub AUTOLOAD {
 
 my $ssh = 'C:\\Programmi\\Utility\\Cygwin\\bin\\ssh.exe';
 my $scp = 'C:\\Programmi\\Utility\\Cygwin\\bin\\scp.exe';
+my( $once_scp, $once_ssh );
 
-$Net::SSH::ssh = $ssh;
-$Net::SCP::scp = $scp;
-# $Net::SCP::DEBUG = 1;
+sub _require_ssh {
+    return if $once_ssh;
+    require Net::SSH;
+
+    $Net::SSH::ssh = $ssh;
+    $once_ssh = 1;
+}
+
+sub _require_scp {
+    return if $once_scp;
+    require Net::SCP;
+
+    $Net::SCP::scp = $scp;
+    # $Net::SCP::DEBUG = 1;
+    $once_scp = 1;
+}
 
 sub new {
     my $class = shift;
@@ -35,6 +47,8 @@ sub new {
 }
 
 sub _put_file {
+    _require_scp();
+
     my( $self, $file, $name ) = @_;
     my $scp = Net::SCP->new( $self->_distconfig->remote_host,
                              $self->_distconfig->remote_user ) or die $!;
@@ -44,6 +58,8 @@ sub _put_file {
 }
 
 sub _get_file {
+    _require_scp();
+
     my( $self, $file, $name ) = @_;
     my $scp = Net::SCP->new( $self->_distconfig->remote_host,
                              $self->_distconfig->remote_user ) or die $!;
@@ -62,18 +78,22 @@ sub _put_string {
 }
 
 sub _exec_string {
+    _require_ssh();
+
     my( $self, $string ) = @_;
     $self->_put_string( $string, 'tmp.sh' );
 
-    ssh( ( sprintf "%s\@%s", $self->_distconfig->remote_user,
-                             $self->_distconfig->remote_host ),
-         'sh', 'tmp.sh' );
+    Net::SSH::ssh( ( sprintf "%s\@%s", $self->_distconfig->remote_user,
+                                       $self->_distconfig->remote_host ),
+                   'sh', 'tmp.sh' );
 }
 
 sub _exec_command {
+    _require_ssh();
+
     my( $self, $host, $user, @data ) = @_;
 
-    ssh( "$user\@$host", @data );
+    Net::SSH::ssh( "$user\@$host", @data );
 }
 
 1;

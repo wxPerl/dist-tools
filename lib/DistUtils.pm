@@ -7,7 +7,7 @@ use Carp;
 use File::Spec::Functions qw(catfile catdir updir);
 
 @EXPORT = qw(my_chdir my_system my_unlink
-             is_wx24 is_wx25 extract check_file check_dir);
+             is_wx24 is_wx26 extract check_file check_dir);
 
 sub my_chdir($) {
     print "cd $_[0]\n";
@@ -30,8 +30,8 @@ sub my_system {
 
 sub is_wx24($) { die unless $_[0]->wxwin_version;
                  $_[0]->wxwin_version =~ m/^2.4/ }
-sub is_wx25($) { die unless $_[0]->wxwin_version;
-                 $_[0]->wxwin_version =~ m/^2.5/ }
+sub is_wx26($) { die unless $_[0]->wxwin_version;
+                 $_[0]->wxwin_version =~ m/^2.[56]/ }
 
 sub extract {
   my $archive = shift;

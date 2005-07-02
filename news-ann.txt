@@ -1,4 +1,4 @@
-Subject: [ANNOUNCE] wxPerl 0.21
+Subject: [ANNOUNCE] wxPerl 0.23
 
 A new version of wxPerl, the Perl bindings to wxWidgets, is out!
 
@@ -7,28 +7,27 @@ toolkit with native look and feel.  (visit http://www.wxwidgets.org/
 for details).
 
 You can download wxPerl sources from
-$CPAN/authors/id/M/MB/MBARBON/Wx-0.21.tar.gz;
+$CPAN/authors/id/M/MB/MBARBON/Wx-0.23.tar.gz;
 
 Screenshots: http://wxperl.sourceforge.net/sshot01.html
-Binary packages for ActivePerl/Win32 6xx and 8xx builds, and Red Hat
-Linux are available along with documentation in HTML and MS HTML Help
-format from http://wxperl.sourceforge.net/download.html
+Binary packages for ActivePerl/Win32 8xx builds, Red Hat
+Linux and Mac OS X are available along with documentation
+in HTML and MS HTML Help format from
+http://wxperl.sourceforge.net/download.html
 
 The project home page is http://wxperl.sourceforge.net/. There is also
 a mailing list dedicated to wxPerl users:
 wxperl-users@lists.sourceforge.net
 
 Changes since the last release:
-	- Fixed installation of 'wxPerl' command on Mac OS X.
-	- Fixed running in the embedded case (still requires the
-	  application to call ExitMainLoop at the right places).
-	- Wrapped wxNavigationKeyEvent.
-	- Using die() in an event handler should not crash anymore
-	  (it might leak).
-	- Added Wx::PlWindow, to be used for custom controls.
-	- New (Windows-only) --mslu flag for Makefile.PL.
-	- Wx::NotebookSizer is now no longer needed and
-	  deprecated.
+	- Added wxArtProvider and Wx::PlArtProvider
+          (thanks to Matthew "Cheetah" Gabeler-Lee).
+	- Compatibility with wxWidgets 2.5.4, 2.6.0 and 2.6.1.
+	- Added Wx::PlPreviewFrame, Wx::PlPreviewControlBar,
+	  Wx::PrintFactory.
+	- Added Wx::PopupWindow and Wx::PopupTransientWindow.
+	- Added Wx::DatePickerCtrl. (2.5/2.6)
+	- Added Wx::MimeTypesManager.
 
 Regards
 Mattia

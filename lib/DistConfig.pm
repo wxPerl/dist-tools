@@ -62,7 +62,9 @@ sub new {
     my $wxmac_src = length( $wxmac_archive ) ?
       catfile( $wx_data_dir, $wxmac_archive ) : '';
     my @wxmac_archives = map { catfile( $wx_data_dir, $_ ) }
-                             v( $mac, 'archives' );
+                             v( $mac, 'archives' ) if v( $mac, 'archives' );
+    my @wxmac_patches = map { $_ ? catfile( $wx_data_dir, $_ ) : () }
+      v( $mac, 'patches' );
     my $wxmac_directory = v( $mac, 'directory' ) || '';
 
     my $remote_user = $host ? v( $host, 'user' ) : '';
@@ -77,15 +79,15 @@ sub new {
                        '';
 
     mkpath $temp_dir;
-    mkpath $distribution_dir;
-
+    mkpath $distribution_dir
+;
     @{$self}{qw(wxperl_src wxperl_version wxperl_directory wxmsw_src temp_dir
              distribution_dir data_dir wxwin_version contrib_makefiles
              wxmsw_patches wxperl_doc_dir rpm_spec
              remote_user remote_group remote_home remote_host
              wxmsw_archives wxperl_number wxgtk_archive
              wxgtk_src wxwin_number wxgtk_directory wxmsw_directory
-             ccache wxperl_unicode wxmac_src
+             ccache wxperl_unicode wxmac_src wxmac_patches
              wxmac_directory wxmac_archive wx_data_dir wxmac_archives)} =
         ( $wxperl_src, $wxperl_version, $wxperl_directory, $wxmsw_src, $temp_dir,
           $distribution_dir, $data_dir, $wxwin_version, $contrib_makefiles,
@@ -93,7 +95,7 @@ sub new {
           $remote_user, $remote_group, $remote_home, $remote_host,
           \@wxmsw_archives, $wxperl_number, $wxgtk_archive,
           $wxgtk_src, $wxwin_number, $wxgtk_directory, $wxmsw_directory,
-          $ccache, $wxperl_unicode, $wxmac_src,
+          $ccache, $wxperl_unicode, $wxmac_src, \@wxmac_patches,
           $wxmac_directory, $wxmac_archive, $wx_data_dir, \@wxmac_archives,
         );
 
