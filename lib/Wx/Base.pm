@@ -19,8 +19,10 @@ sub AUTOLOAD {
     goto &$AUTOLOAD;
 }
 
-my $ssh = 'C:\\Programmi\\Utility\\Cygwin\\bin\\ssh.exe';
-my $scp = 'C:\\Programmi\\Utility\\Cygwin\\bin\\scp.exe';
+sub is_win32() { $^O =~ /MSWin/i }
+
+my $ssh = is_win32 ? 'C:\\Programmi\\Utility\\Cygwin\\bin\\ssh.exe' : 'ssh';
+my $scp = is_win32 ? 'C:\\Programmi\\Utility\\Cygwin\\bin\\scp.exe' : 'scp';
 my( $once_scp, $once_ssh );
 
 sub _require_ssh {
@@ -54,7 +56,13 @@ sub _put_file {
                              $self->_distconfig->remote_user ) or die $!;
 
     $file =~ s!^(\w):!/cygdrive/$1!; $file =~ tr!\\!/!;
-    $scp->put( $file, $name ) or die $scp->{errstr};
+    if( $^O =~ /MSWin/i ) {
+	$scp->put( $file, $name ) or die $scp->{errstr};
+    } else {
+	foreach my $f ( glob $file ) {
+	    $scp->put( $f, $name ) or die $scp->{errstr};
+	}
+    }
 }
 
 sub _get_file {

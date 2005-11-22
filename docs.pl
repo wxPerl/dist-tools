@@ -47,7 +47,7 @@ make_html_zip();
 make_chm();
 
 sub make_tex {
-  foreach my $i ( qw(gif ini sty inc tex bib bmp dot eps hpj txt css) ) {
+  foreach my $i ( qw(gif ini sty inc tex bib bmp dot eps txt css) ) {
     my $glob = catfile( $wxperl_doc_dir, "*.$i" );
     my $cmd = $i eq 'tex' ? 'perl copytex.pl' : 'cp';
     $i =~ 'css' ?    system( "$cmd $glob $tex_build" )

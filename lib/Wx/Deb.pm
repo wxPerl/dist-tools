@@ -106,6 +106,7 @@ EOS
 
     # ccache support
     my $ccache = $self->ccache;
+    my $xhost = $dc->xhost;
     my $functions = common_functions;
 
     # build
@@ -118,7 +119,7 @@ set -x
 $ccache
 $functions
 
-export DISPLAY=192.168.9.2:0.0
+export DISPLAY=$xhost
 
 if test "$wxwin_number" != "`wx-config --version`"; then
   echo "found version '`wx-config --version`', wanting '$wxwin_number'"
@@ -199,6 +200,7 @@ sub build_submodules {
         $self->_put_file( $package_src, $dc->remote_home );
 
         my $ccache = $self->ccache;
+	my $xhost = $dc->xhost;
 
         # build
         $self->_exec_string( <<EOT );
@@ -210,7 +212,7 @@ set -x
 $ccache
 # \$functions
 
-export DISPLAY=192.168.9.2:0.0
+export DISPLAY=$xhost
 
 sudo perl cpan2rpm/cpan2rpm --name $package_nover $src_base
 sudo rpmbuild -ba buildarea/SPECS/$package_nover.spec

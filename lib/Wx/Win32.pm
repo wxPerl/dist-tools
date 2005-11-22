@@ -123,7 +123,7 @@ sub build_wxwidgets {
             $makefile = 'makefile.gcc';
             my_chdir catdir( $self->wxmsw_build, 'build', 'msw' );
         } else {
-            $opt .= ' FINAL=1 CXXFLAGS=-Os WXMAKINGDLL=1';
+            $opt .= ' CXXFLAGS=-Os FINAL=1 WXMAKINGDLL=1';
             $makefile = 'makefile.g95';
             my_chdir catdir( $self->wxmsw_build, 'src', 'msw' );
         }
@@ -290,7 +290,7 @@ sub build_submodules {
 
         # build module
         my_chdir $package_build;
-        my_system "perl -MConfig_m Makefile.PL";
+        my_system 'perl -MConfig_m Makefile.PL --extra-cflags=" -Os -g "';
         my_system 'nmake test';
 
         # create ppm

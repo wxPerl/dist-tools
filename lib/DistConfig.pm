@@ -30,6 +30,7 @@ sub new {
     my $distribution_dir = v( 'Directories', "dist-$^O" );
 
     my $ccache = v( $host, 'ccache' );
+    my $xhost = v( $host, 'xhost' );
 
     my $my_wxperl_version = v( $distrib, 'wxperl_version' );
     ( my $wxperl_number = $my_wxperl_version ) =~ s/[^\d\.].*$//;
@@ -87,7 +88,7 @@ sub new {
              remote_user remote_group remote_home remote_host
              wxmsw_archives wxperl_number wxgtk_archive
              wxgtk_src wxwin_number wxgtk_directory wxmsw_directory
-             ccache wxperl_unicode wxmac_src wxmac_patches
+             ccache xhost wxperl_unicode wxmac_src wxmac_patches
              wxmac_directory wxmac_archive wx_data_dir wxmac_archives)} =
         ( $wxperl_src, $wxperl_version, $wxperl_directory, $wxmsw_src, $temp_dir,
           $distribution_dir, $data_dir, $wxwin_version, $contrib_makefiles,
@@ -95,7 +96,7 @@ sub new {
           $remote_user, $remote_group, $remote_home, $remote_host,
           \@wxmsw_archives, $wxperl_number, $wxgtk_archive,
           $wxgtk_src, $wxwin_number, $wxgtk_directory, $wxmsw_directory,
-          $ccache, $wxperl_unicode, $wxmac_src, \@wxmac_patches,
+          $ccache, $xhost, $wxperl_unicode, $wxmac_src, \@wxmac_patches,
           $wxmac_directory, $wxmac_archive, $wx_data_dir, \@wxmac_archives,
         );
 

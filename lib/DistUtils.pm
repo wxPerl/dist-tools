@@ -25,7 +25,7 @@ sub my_system {
   print $cmd, "\n";
 
   if( @_ > 1 ) { $ret = system @_ } else { $ret = system $_[0] }
-  $ret and croak "system: $cmd";
+  $ret and croak "system: $cmd: $?";
 }
 
 sub is_wx24($) { die unless $_[0]->wxwin_version;

@@ -122,6 +122,7 @@ EOS
     # ccache support
     my $ccache = $self->ccache;
     my $functions = common_functions;
+    my $xhost = $dc->xhost;
 
     # build
     $self->_exec_string( <<EOT );
@@ -133,7 +134,7 @@ set -x
 $ccache
 $functions
 
-export DISPLAY=192.168.9.2:0.0
+export DISPLAY=$xhost
 export wxgtk_directory=$wxgtk_directory
 SRC=../SOURCES
 
@@ -201,7 +202,7 @@ sub build_submodules {
     my( $self,  @modules ) = @_;
     my $dc = $self->_distconfig;
 
-    my( $rpm_release, $rpm_arch ) = qw(1 i686);
+    my( $rpm_release, $rpm_arch ) = qw(1 i386);
     my $buildarea = $self->buildarea;
 
     $self->_exec_string( "mkdir -p cpan2rpm" );
@@ -221,6 +222,7 @@ sub build_submodules {
         $self->_put_file( $package_src, $dc->remote_home );
 
         my $ccache = $self->ccache;
+	my $xhost = $dc->xhost;
 
         # build
         $self->_exec_string( <<EOT );
@@ -232,15 +234,15 @@ set -x
 $ccache
 # \$functions
 
-export DISPLAY=192.168.9.2:0.0
+export DISPLAY=$xhost
 
-sudo perl cpan2rpm/cpan2rpm --name $package_nover $src_base
+sudo perl cpan2rpm/cpan2rpm --buildarch i386 --name $package_nover $src_base
 sudo rpmbuild -ba buildarea/SPECS/$package_nover.spec
 
 exit 0
 EOT
 
-        my $bin_rpm = "$buildarea/RPMS/${rpm_arch}/perl-$package-${rpm_release}.i686.rpm";
+        my $bin_rpm = "$buildarea/RPMS/${rpm_arch}/perl-$package-${rpm_release}.i386.rpm";
         my $src_rpm = "$buildarea/SRPMS/perl-$package-${rpm_release}.src.rpm";
 
 #        die "something went wrong while building ($bin_rpm) ($src_rpm)"
