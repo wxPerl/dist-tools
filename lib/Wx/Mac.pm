@@ -69,7 +69,8 @@ sub set_options {
       ( "--prefix=$prefix --with-opengl --disable-compat24" .
           ( $dc->wxperl_unicode ? " --enable-unicode" :
                                   " --disable-unicode" ) .
-          " --disable-compat22",
+          " --disable-compat22 --with-libtiff=builtin --with-libjpeg=builtin" .
+	  " --with-expat=builtin --with-libpng=builtin",
         "",
         "$tmpdir/devel/wxWidgets",
         "$tmpdir/devel/wxPerl",

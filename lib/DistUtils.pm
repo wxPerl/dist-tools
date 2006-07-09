@@ -5,8 +5,9 @@ use base qw(Exporter);
 use vars qw(@EXPORT);
 use Carp;
 use File::Spec::Functions qw(catfile catdir updir);
+use File::Copy;
 
-@EXPORT = qw(my_chdir my_system my_unlink
+@EXPORT = qw(my_chdir my_system my_unlink my_copy
              is_wx24 is_wx26 extract check_file check_dir);
 
 sub my_chdir($) {
@@ -17,6 +18,11 @@ sub my_chdir($) {
 sub my_unlink($) {
     print "unlink $_[0]\n";
     unlink $_[0] or croak "unlink '$_[0]': $!";
+}
+
+sub my_copy($$) {
+    print "copy $_[0]\n";
+    copy $_[0], $_[1] or croak "copy '$_[0]' '$_[1]': $!";
 }
 
 sub my_system {
