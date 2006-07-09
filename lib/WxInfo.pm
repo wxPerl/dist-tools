@@ -28,6 +28,26 @@ sub do_scan_xs {
   my $module_seen = 0;
 
   while( <$fh> ) {
+    # added by BKE (bke@bkecc.com) - 09/02/2003
+    # must be done before $module_seen check
+    m/I\(\s*(.+?),\s*(.+?)\s*\)/ and do {
+
+      # the conditional part of conditional inheritance is not
+      # taken into account
+      # for example:
+      #     #if HAS_TLW
+      #         I( Dialog,          TopLevelWindow )
+      #      #else
+      #        I( Dialog,          Panel )
+      #     #endif
+      # currently means that as far as WxInfo is concerned Dialog
+      # inherits from both TopLevelWindow and Panel.
+      # Is this a major problem?
+
+      # used a hash to avoid duplicate entries
+      ${$pl_inheritance}{$1}->{$2}++;
+    };
+
     $module_seen = $module_seen || m/^MODULE=/;
     next unless $module_seen;
 
@@ -54,25 +74,6 @@ sub do_scan_xs {
       ${$pl_funcs}{$method} = $pl_method;
       next;
     };
-
-    # added by BKE (bke@bkecc.com) - 09/02/2003
-    m/I\(\s*(.+?),\s*(.+?)\s*\)/ and do {
-
-      # the conditional part of conditional inheritance is not
-      # taken into account
-      # for example:
-      #     #if HAS_TLW
-      #         I( Dialog,          TopLevelWindow )
-      #      #else
-      #        I( Dialog,          Panel )
-      #     #endif
-      # currently means that as far as WxInfo is concerned Dialog
-      # inherits from both TopLevelWindow and Panel.
-      # Is this a major problem?
-
-      # used a hash to avoid duplicate entries
-      ${$pl_inheritance}{$1}->{$2}++;
-    };
   }
 }
 
@@ -90,6 +91,7 @@ sub _scan_source {
 
     return unless -f $_;
     return unless m/\.xs$|\.pm$/i;
+#    return unless m/Constant\.xs$/i;
 
     open my $in, "< $_";
 

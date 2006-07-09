@@ -7,16 +7,19 @@ use File::Spec;
 use File::Basename;
 use WxInfo;
 
-my( $pattern, $dest ) = @ARGV;
-my $wxperl = 'C:/Developement/wxPerl/wxPerl';
+my $dest = pop @ARGV;
+my( @patterns ) = @ARGV;
+my $wxperl = '../wxPerl';
 use vars qw(%pl_classes %pl_funcs %pl_inheritance);
 
 scan_wxperl();
 process_tex();
 
+exit 0;
+
 sub process_tex {
-  foreach my $f ( glob( $pattern ) ) {
-    my $fname = ( fileparse( $f ) )[0];
+  foreach my $f ( map { glob } @patterns ) {
+    my $fname = basename( $f );
     my $destfile = File::Spec->catfile( $dest, $fname );
 
     local( *IN, *OUT );

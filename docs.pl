@@ -74,9 +74,11 @@ sub make_chm {
 
   my_chdir $html_build;
   die "no file 'manua.hhp'" unless -f 'manua.hhp';
-  system( "$hhc manua.hhp" );
-  die "no file 'manua.chm'" unless -f 'manua.chm';
-  my_system( "mv manua.chm $chmfile" );
+  if( -f $hhc ) {
+    system( "$hhc manua.hhp" );
+    die "no file 'manua.chm'" unless -f 'manua.chm';
+    my_system( "mv manua.chm $chmfile" );
+  }
 }
 
 sub make_tex_zip {
