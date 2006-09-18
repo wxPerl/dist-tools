@@ -103,7 +103,13 @@ sub _scan_source {
           $pl_package = $package = $1;
           $package =~ s/^Wx::/wx/;
           ${$pl_classes}{$package} = $pl_package;
+          if( /\@ISA\s*=\s*qw\(Wx::(\S+)\)/ ) {
+              ${$pl_inheritance}{substr $pl_package, 4}->{$1}++;
+          }
           next;
+        };
+        m/\@ISA = qw\(Wx::(\S+)\)/ and do {
+            ${$pl_inheritance}{substr $pl_package, 4}->{$1}++;
         };
         m/^(?:\#\!)?sub\s+(\w+)/ and do {
           my $pl_method = "${pl_package}::${1}";

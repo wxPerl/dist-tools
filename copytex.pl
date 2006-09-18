@@ -54,7 +54,7 @@ sub process_tex {
           # right now noting inheritance in the docs for testing.
           # keep doing this?
           if ($inherited) {
-            print OUT "\n\\perlnote{This method is inherited from $inherited.}\n";
+#            print OUT "\n\\perlnote{This method is inherited from $inherited.}\n";
           }
           else {
             print OUT "\n\\perlnote{This method is not implemented in wxPerl}\n";
