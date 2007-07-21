@@ -2,6 +2,7 @@ package WxInfo;
 
 use strict;
 use File::Find;
+use Fatal qw(open);
 
 sub new {
   my( $ref, $path ) = @_;
@@ -18,12 +19,64 @@ sub new {
   return $this;
 }
 
+sub _sharp_bang {
+  my( $this, $package, $pl_package ) = @_;
+
+  m/^(?:\#\!)?sub\s+(\w+)/ and do {
+    my $pl_method = "${pl_package}::${1}";
+    my $method = "${package}::${1}";
+
+    ${$this->{FUNCTIONS}}{$method} = $pl_method;
+  } and return 1;
+  m/^\#\!\s+(\w+)/ and do {
+    my $pl_method = "${pl_package}::${1}";
+    my $method = "${package}::${1}";
+
+    ${$this->{FUNCTIONS}}{$method} = $pl_method;
+  } and return 1;
+  return 0;
+}
+
+sub do_scan_pm {
+  my $this = shift;
+  my $fh = shift;
+  my( $pl_classes, $pl_funcs, $pl_inheritance ) =
+    @{$this}{'CLASSES','FUNCTIONS','INHERITANCE'};
+  my( $package, $pl_package );
+
+  while( <$fh> ) {
+    m/^package\s+([\w\:]+)\s*\;/ and do {
+      $pl_package = $package = $1;
+      $package =~ s/^Wx::/wx/;
+      ${$pl_classes}{$package} = $pl_package;
+      if( /\@ISA\s*=\s*qw\(Wx::(\S+)\)/ ) {
+          ${$pl_inheritance}{substr $pl_package, 4}->{$1}++;
+      }
+      next;
+    };
+    m/\@ISA = qw\(Wx::(\S+)\)/ and do {
+        ${$pl_inheritance}{substr $pl_package, 4}->{$1}++;
+    };
+    _sharp_bang( $this, $package, $pl_package ) and next;
+    m/^sub\s*(\w+)/ and do {
+      my $m = $1;
+      my $pl_method = "${pl_package}::${m}";
+
+      $m = $package if $m eq 'new';
+      my $method = "${package}::${m}";
+
+      ${$pl_funcs}{$method} = $pl_method;
+      next;
+    };
+  }
+}
+
 sub do_scan_xs {
   my $this = shift;
+  my $fh = shift;
   my( $pl_classes, $pl_funcs, $pl_inheritance ) =
     @{$this}{'CLASSES','FUNCTIONS','INHERITANCE'};
 
-  my $fh = shift;
   my( $package, $pl_package );
   my $module_seen = 0;
 
@@ -64,6 +117,7 @@ sub do_scan_xs {
       do_scan_xs( $this, $in );
       next;
     };
+    _sharp_bang( $this, $package, $pl_package ) and next;
     m/^([\w\:]+)\(/ and do {
       ( my $m = $1 ) =~ s/^.*:://;
       my $pl_method = "${pl_package}::${m}";
@@ -90,37 +144,17 @@ sub _scan_source {
     }
 
     return unless -f $_;
-    return unless m/\.xs$|\.pm$/i;
+    return unless m/\.xs$|\.pm$|\.h$|\.cpp$/i;
 #    return unless m/Constant\.xs$/i;
 
     open my $in, "< $_";
 
     if( m/\.pm$/ ) {
-      my( $package, $pl_package );
-
-      while( <$in> ) {
-        m/^package\s+([\w\:]+)\s*\;/ and do {
-          $pl_package = $package = $1;
-          $package =~ s/^Wx::/wx/;
-          ${$pl_classes}{$package} = $pl_package;
-          if( /\@ISA\s*=\s*qw\(Wx::(\S+)\)/ ) {
-              ${$pl_inheritance}{substr $pl_package, 4}->{$1}++;
-          }
-          next;
-        };
-        m/\@ISA = qw\(Wx::(\S+)\)/ and do {
-            ${$pl_inheritance}{substr $pl_package, 4}->{$1}++;
-        };
-        m/^(?:\#\!)?sub\s+(\w+)/ and do {
-          my $pl_method = "${pl_package}::${1}";
-          my $method = "${package}::${1}";
-
-          ${$pl_funcs}{$method} = $pl_method;
-          next;
-        };
-      }
+      do_scan_pm( $this, $in );
     } elsif ( m/\.xs$/ ) {
       do_scan_xs( $this, $in );
+    } elsif ( m/\.h$|\.cpp$/ ) {
+      # do_scan_c( $this, $in );
     }
   };
 
