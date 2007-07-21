@@ -21,7 +21,7 @@ sub my_unlink($) {
 }
 
 sub my_copy($$) {
-    print "copy $_[0]\n";
+    print "copy $_[0] $_[1]\n";
     copy $_[0], $_[1] or croak "copy '$_[0]' '$_[1]': $!";
 }
 

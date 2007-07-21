@@ -3,6 +3,7 @@ package Wx::Base;
 use strict;
 use warnings;
 use File::Temp;
+use Carp;
 
 sub _distconfig { $_[0]->{distconfig} }
 
@@ -54,6 +55,8 @@ sub _put_file {
     my( $self, $file, $name ) = @_;
     my $scp = Net::SCP->new( $self->_distconfig->remote_host,
                              $self->_distconfig->remote_user ) or die $!;
+
+    confess unless $file;
 
     $file =~ s!^(\w):!/cygdrive/$1!; $file =~ tr!\\!/!;
     if( $^O =~ /MSWin/i ) {
