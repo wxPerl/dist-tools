@@ -15,13 +15,13 @@ my $driver = $module->new;
 
 foreach my $config ( @configs ) {
     $driver->set_options( config => $config );
-    $driver->build_wxwidgets;
+    $driver->build_alien;
     $driver->build_wxperl;
-    $driver->package_wxwidgets;
+    $driver->package_alien;
     $driver->package_wxperl;
     $driver->install_wxperl;
-    $driver->build_submodules( 'Wx-GLCanvas-0.03.tar.gz',
-                               'Wx-ActiveX-0.059901.tar.gz' );
+#    $driver->build_submodules( 'Wx-GLCanvas-0.07.tar.gz',
+#                               'Wx-ActiveX-0.059901.tar.gz' );
     $driver->make_dist;
 }
 

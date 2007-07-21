@@ -36,9 +36,9 @@ sub set_options {
       "wxgtk$wxwin_version.$rpm_arch.rpm";
     my $src_final_rpm = "$rpm_name-$wxperl_version-$rpm_release.src.rpm";
     my $bin_rpm = catfile( $buildarea, 'RPMS', $rpm_arch,
-                           "$rpm_name-$wxperl_number-$rpm_release.$rpm_arch.rpm" );
+                           "$rpm_name-$wxperl_version-$rpm_release.$rpm_arch.rpm" );
     my $src_rpm = catfile( $buildarea, 'SRPMS',
-                           "$rpm_name-$wxperl_number-$rpm_release.src.rpm" );
+                           "$rpm_name-$wxperl_version-$rpm_release.src.rpm" );
 
     @{$self}{qw(ccache buildarea bin_final_rpm src_final_rpm
                 bin_rpm src_rpm)}
@@ -46,18 +46,132 @@ sub set_options {
           $bin_rpm, $src_rpm );
 }
 
-sub build_wxwidgets {
+sub build_alien {
+    my $self = shift;
+
+    my $buildarea = $self->buildarea;
+
+    $self->_exec_string( <<EOS );
+#!/bin/sh
+
+set -e
+set -x
+
+sudo rm -rf $buildarea
+mkdir -p $buildarea
+for d in RPMS RPMS/i386 SRPMS SOURCES BUILD SPECS; do
+    mkdir -p $buildarea/\$d
+done
+EOS
 }
 
 sub build_wxperl {
 }
 
-sub package_wxwidgets {
+sub _package_x {
+    my( $self, $rpm_spec, $src, $version, $number,
+        $src_rpm, $bin_rpm, $src_final_rpm, $bin_final_rpm ) = @_;
+    my $dc = $self->_distconfig;
+
+    my $buildarea = $self->buildarea;
+
+    my $remote_home = $dc->remote_home;
+    my $wxwin_number = $dc->wxwin_number;
+    my $distribution_dir = $dc->distribution_dir;
+
+    # copy files
+    $self->_put_file( $src, catfile( $buildarea, 'SOURCES' ) );
+
+    # generate spec file / basic sanity checks
+    my $base_spec = basename( $rpm_spec );
+    my $out_spec = "$buildarea/SPECS/" . $base_spec;
+    my( $rpm_release, $rpm_arch ) = qw(1 i386);
+
+    my $tmpl = Text::Template->new( TYPE => 'FILE',
+                                    SOURCE => $rpm_spec,
+                                    DELIMITERS => [ '<%', '%>' ] );
+
+    my $spec;
+
+    die "Error while filling template: $Text::Template::ERROR"
+      unless $spec = $tmpl->fill_in( HASH =>
+                                     { full_ver => $version,
+                                       ver => $number,
+                                       release => $rpm_release,
+                                       wxgtk_version => $dc->wxwin_version,
+                                       makefile_flags => '',
+                                     } );
+
+    $self->_put_string( $spec, $out_spec );
+
+    # ccache support
+    my $ccache = $self->ccache;
+    my $functions = common_functions;
+    my $xhost = $dc->xhost;
+
+    # build
+    $self->_exec_string( <<EOT );
+#!/bin/sh
+
+set -e
+set -x
+
+$ccache
+$functions
+
+export DISPLAY=$xhost
+SRC=../SOURCES
+
+if test "$wxwin_number" != "`wx-config --version`"; then
+  echo "found version '`wx-config --version`', wanting '$wxwin_number'"
+  exit 1
+fi
+
+sudo rpmbuild -ba buildarea/SPECS/$base_spec
+
+exit 0
+EOT
+
+    $self->_get_file( $src_rpm, "$distribution_dir/$src_final_rpm" );
+    $self->_get_file( $bin_rpm, "$distribution_dir/$bin_final_rpm" );
+}
+
+sub package_alien {
+    my $self = shift;
+    my $dc = $self->_distconfig;
+
+    my $buildarea = $self->buildarea;
+    my( $rpm_release, $rpm_arch ) = qw(1 i386);
+    my $alien_version = $dc->alien_version;
+    my $alien_number = $dc->alien_number;
+    my $wxwin_version = $dc->wxwin_version;
+
+    my $rpm_name = 'perl-Alien-wxWidgets';
+    my $bin_final_rpm = "$rpm_name-$alien_version-${rpm_release}_" .
+      "wxgtk$wxwin_version.$rpm_arch.rpm";
+    my $src_final_rpm = "$rpm_name-$alien_version-$rpm_release.src.rpm";
+    my $bin_rpm = catfile( $buildarea, 'RPMS', $rpm_arch,
+                           "$rpm_name-$alien_version-$rpm_release.$rpm_arch.rpm" );
+    my $src_rpm = catfile( $buildarea, 'SRPMS',
+                           "$rpm_name-$alien_version-$rpm_release.src.rpm" );
+
+    _package_x( $self, 'perl-Alien-wxWidgets.spec', $dc->alien_src,
+                $dc->alien_version,
+                $dc->alien_number, $src_rpm, $bin_rpm,
+                $src_final_rpm, $bin_final_rpm );
+
+    _install_x( $self, $bin_rpm, '"Alien\\|Wx"' );
 }
 
 sub package_wxperl {
     my $self = shift;
     my $dc = $self->_distconfig;
+
+    _package_x( $self, $dc->rpm_spec, $dc->wxperl_src, $dc->wxperl_version,
+                $dc->wxperl_number, $self->src_rpm, $self->bin_rpm,
+                $self->src_final_rpm, $self->bin_final_rpm );
+
+    return;
 
     my $buildarea = $self->buildarea;
 
@@ -68,7 +182,6 @@ sub package_wxperl {
     my $wxgtk_archive = $dc->wxgtk_archive;
     my $wxwin_number = $dc->wxwin_number;
     my $distribution_dir = $dc->distribution_dir;
-    my $got_contrib = is_wx26( $dc );
 
     $self->_exec_string( <<EOS );
 #!/bin/sh
@@ -85,12 +198,6 @@ EOS
 
     # copy files
     $self->_put_file( $dc->wxperl_src, catfile( $buildarea, 'SOURCES' ) );
-    $self->_put_file( $dc->wxgtk_src, catfile( $buildarea, 'SOURCES' ) )
-      unless $got_contrib;
-    $self->_put_file( $contrib_makefiles, catfile( $buildarea, 'SOURCES' ) )
-      unless $got_contrib;
-
-    my $makefiles_tgz = basename $contrib_makefiles;
 
     # generate spec file / basic sanity checks
     my $out_spec = "$buildarea/SPECS/" . basename( $rpm_spec );
@@ -101,11 +208,6 @@ EOS
                                     DELIMITERS => [ '<%', '%>' ] );
 
     my $xxx = "`pwd`/../\$wxgtk_directory";
-    my $makefile_flags =
-        ( $got_contrib ? '' :
-                         qq{ --extra-cflags="-I${xxx}/contrib/include" } .
-                         qq{ --extra-libs="-L${xxx}/lib" } );
-
     my $spec;
 
     die "Error while filling template: $Text::Template::ERROR"
@@ -114,7 +216,7 @@ EOS
                                        ver => $dc->wxperl_number,
                                        release => $rpm_release,
                                        wxgtk_version => $dc->wxwin_version,
-                                       makefile_flags => $makefile_flags,
+                                       makefile_flags => '',
                                      } );
 
     $self->_put_string( $spec, $out_spec );
@@ -143,21 +245,6 @@ if test "$wxwin_number" != "`wx-config --version`"; then
   exit 1
 fi
 
-if test "${got_contrib}" = "0"; then
-    cd buildarea/BUILD
-    extract_wx_archive \$SRC/${wxgtk_archive} "\$wxgtk_directory/contrib/*"
-    cd \$wxgtk_directory
-    mkdir lib
-    extract ../\$SRC/$makefiles_tgz
-    cd contrib/src
-    for i in xrc stc; do
-      test -d \$i && ( cd \$i && make -f makefile.unx )
-    done
-
-    cd ../../..
-    cd ../..
-fi
-
 sudo rpmbuild -ba buildarea/SPECS/perl-Wx.spec
 
 exit 0
@@ -176,8 +263,35 @@ EOT
     $self->_get_file( $bin_rpm, "$distribution_dir/$bin_final_rpm" );
 }
 
+sub _install_x {
+    my( $self, $bin_rpm, $delete ) = @_;
+    my( $rpm_release, $rpm_arch ) = qw(1 i386);
+    my $irpm = catfile( $self->_distconfig->remote_home,
+                        'buildarea', 'RPMS', $rpm_arch,
+                        basename( $bin_rpm ) );
+
+    $self->_exec_string( sprintf <<'EOT', $delete, $irpm );
+#!/bin/sh
+
+# set -e
+set -x
+
+rpms=`rpm -q -a | grep %s`
+if test "x$rpms" != "x"; then
+  sudo rpm -e $rpms
+fi
+
+sudo rpm -i %s
+EOT
+}
+
 sub install_wxperl {
     my $self = shift;
+
+    _install_x( $self, $self->bin_rpm, 'Wx' );
+
+    return;
+
     my( $rpm_release, $rpm_arch ) = qw(1 i386);
     my $irpm = catfile( $self->_distconfig->remote_home,
                         'buildarea', 'RPMS', $rpm_arch,

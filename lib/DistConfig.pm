@@ -31,14 +31,22 @@ sub new {
 
     my $ccache = v( $host, 'ccache' );
     my $xhost = v( $host, 'xhost' );
+    my $use_x = v( $host, 'use_x' );
+    $xhost = '' unless $use_x;
 
     my $my_wxperl_version = v( $distrib, 'wxperl_version' );
     ( my $wxperl_number = $my_wxperl_version ) =~ s/[^\d\.].*$//;
     my $wxperl_version = $my_wxperl_version;
-    my $wxperl_directory = "Wx-${wxperl_number}";
+    my $wxperl_directory = "Wx-${wxperl_version}";
+
+    my $my_alien_version = v( 'Alien', 'alien_version' );
+    ( my $alien_number = $my_alien_version ) =~ s/[^\d\.].*$//;
+    my $alien_version = $my_alien_version;
+    my $alien_directory = "Alien-wxWidgets-${alien_version}";
 
     my $wxperl_doc_dir = v( v( $distrib, 'docs' ), 'doc_dir' );
     my $wxperl_src = catfile( $wx_data_dir, "Wx-${wxperl_version}.tar.gz" );
+    my $alien_src = catfile( $wx_data_dir, "Alien-wxWidgets-${alien_version}.tar.gz" );
     my $wxperl_unicode = v( $distrib, 'unicode' ) || 0;
     my $wxwin_version = v( $distrib, 'wxwin_version' );
     ( my $wxwin_number = $wxwin_version ) =~ s/[^\d\.].*$//;
@@ -89,7 +97,9 @@ sub new {
              wxmsw_archives wxperl_number wxgtk_archive
              wxgtk_src wxwin_number wxgtk_directory wxmsw_directory
              ccache xhost wxperl_unicode wxmac_src wxmac_patches
-             wxmac_directory wxmac_archive wx_data_dir wxmac_archives)} =
+             wxmac_directory wxmac_archive wx_data_dir wxmac_archives
+             alien_src alien_version alien_directory alien_number
+             use_x)} =
         ( $wxperl_src, $wxperl_version, $wxperl_directory, $wxmsw_src, $temp_dir,
           $distribution_dir, $data_dir, $wxwin_version, $contrib_makefiles,
           \@wxmsw_patches, $wxperl_doc_dir, $rpm_spec,
@@ -98,7 +108,8 @@ sub new {
           $wxgtk_src, $wxwin_number, $wxgtk_directory, $wxmsw_directory,
           $ccache, $xhost, $wxperl_unicode, $wxmac_src, \@wxmac_patches,
           $wxmac_directory, $wxmac_archive, $wx_data_dir, \@wxmac_archives,
-        );
+          $alien_src, $alien_version, $alien_directory, $alien_number,
+          $use_x, );
 
     return $self;
 }
