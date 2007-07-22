@@ -11,14 +11,14 @@ Summary: wxPerl - Perl bindings for wxWindows
 Name: perl-Wx
 Version: %{full_ver}
 Release: %{rel}
-Copyright: This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+License: This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 Group: # 
 Source: http://prdownload.sourceforge.net/wxperl/Wx-%{full_ver}.tar.gz
 # Patch: Wx-0.08.patch
 Url: http://wxperl.sourceforge.net/
 BuildRoot: %{blr}
-BuildRequires: perl >= 5.006 , wx-gtk2-unicode-gl >= %{wx_version}, wx-gtk2-unicode-contrib-devel >= %{wx_version}, perl-Alien-wxWidgets >= 0.25
-Requires: wx-gtk2-unicode-contrib >= %{wx_version}
+BuildRequires: perl >= 5.006 , wxGTK-devel >= %{wx_version}, perl-Alien-wxWidgets >= 0.25
+Requires: wxGTK >= %{wx_version}
 
 %description
 wxPerl is a Perl module wrapping the awesome wxWindows library

@@ -11,7 +11,7 @@ Summary: Alien::wxWidgets - Perl-available information about wxWidgets
 Name: perl-Alien-wxWidgets
 Version: %{full_ver}
 Release: %{rel}
-Copyright: This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+License: This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 Group: # 
 Source: http://prdownload.sourceforge.net/wxperl/Alien-wxWidgets-%{full_ver}.tar.gz
 # Patch: Wx-0.08.patch

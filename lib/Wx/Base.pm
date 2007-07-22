@@ -31,6 +31,7 @@ sub _require_ssh {
     require Net::SSH;
 
     $Net::SSH::ssh = $ssh;
+    @Net::SSH::ssh_options = qw(-t);
     $once_ssh = 1;
 }
 
