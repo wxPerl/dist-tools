@@ -119,7 +119,7 @@ sub build_alien {
                                        ' --no-unicode --no-mslu';
 
         my_chdir catdir( $self->alien_build );
-        my_system "perl Build.PL$uc --build_wx --build_wx_opengl --monolithic --source=tar.bz2";
+        my_system "perl Build.PL$uc --build_wx --build_wx_opengl --monolithic --universal --source=tar.bz2";
         my_system 'perl Build';
         my_system "perl Build destdir=$tmpdir/install/Alien-wxWidgets install";
 
