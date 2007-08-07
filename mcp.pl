@@ -20,8 +20,9 @@ foreach my $config ( @configs ) {
     $driver->package_alien;
     $driver->package_wxperl;
     $driver->install_wxperl;
-#    $driver->build_submodules( 'Wx-GLCanvas-0.07.tar.gz',
+    $driver->build_submodules( 'Wx-GLCanvas-0.07.tar.gz',
 #                               'Wx-ActiveX-0.059901.tar.gz' );
+                               );
     $driver->make_dist;
 }
 
