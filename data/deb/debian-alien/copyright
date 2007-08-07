@@ -1,0 +1,12 @@
+This is a prepackaged version of Alien::wxWidgets.
+Mattia Barbon <mattia.barbon@libero.it> is both the
+author and the packager.
+
+the sources are obtained from: http://www.cpan.org/
+The only change is the addition of the debian/ subdirectory.
+
+COPYRIGHT
+
+Copyright (c) 2006-2007 Mattia Barbon.
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

@@ -1,0 +1,44 @@
+#!/usr/bin/make -f
+# -*- Makefile -*-
+
+binary: binary-arch binary-indep
+
+binary-arch: build install
+	dh_testdir lib/Alien/wxWidgets.pm
+	dh_testroot
+	dh_installchangelogs Changes
+	dh_installdocs README.txt
+	dh_fixperms
+	dh_compress
+	dh_installdeb
+	dh_perl
+	dh_shlibdeps
+	dh_gencontrol
+	dh_builddeb
+
+binary-indep:
+
+build: build-stamp
+install: install-stamp
+
+build-stamp:
+	dh_testdir lib/Alien/wxWidgets.pm
+	perl Build.PL --no-build_wx --installdirs vendor
+	./Build	
+	if test "$$DISPLAY" != ""; then make test; fi
+	touch build-stamp
+
+install-stamp:
+	dh_testdir lib/Alien/wxWidgets.pm
+	./Build install destdir=$(CURDIR)/debian/tmp
+	dh_strip
+	touch install-stamp
+
+clean:
+	dh_testdir lib/Alien/wxWidgets.pm
+	dh_testroot
+	rm -f build-stamp install-stamp
+	if [ -e Build ]; then ./Build distclean; fi
+	dh_clean
+
+.PHONY: binary binary-arch binary-indep clean

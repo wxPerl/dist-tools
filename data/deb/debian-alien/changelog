@@ -1,0 +1,5 @@
+libalien-wxwidgets-perl (0.32-1) unstable; urgency=low
+
+  * Initial packaging.
+
+ -- Mattia Barbon <mattia.barbon@libero.it>  Tue, 07 Aug 2007 22:43:34 +0200
