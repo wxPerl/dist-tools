@@ -4,9 +4,9 @@ Priority: extra
 Section: interpreters
 Standards-Version: 3.5.2
 Build-Depends: perl (>= 5.8.0-1), debhelper (>= 3.0.5),
-  libwxgtk2.4-contrib-dev
+  libwxgtk2.8-dev, libalien-wxwidgets-perl, g++
 
-Package: libwx-perl-wxgtk2.4
+Package: libwx-perl-wxgtk2.8
 Priority: extra
 Section: interpreters
 Architecture: any
@@ -15,5 +15,5 @@ Description: Perl wrapper for the wxWidgets GUI toolkit
  wxPerl is a Perl module wrapping the awesome wxWidgets
  library for cross-platform GUI developement.
  .
- This package is compiled against the stable 2.4 branch
+ This package is compiled against the stable 2.8 branch
  of wxWidgets.

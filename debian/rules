@@ -30,7 +30,7 @@ build-stamp:
 
 install-stamp:
 	dh_testdir Wx.pm
-	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 	dh_strip
 	touch install-stamp
 

@@ -2,11 +2,11 @@ This is a prepackaged version of wxPerl, the Perl bindings to
 wxWindows. Mattia Barbon <mattia.barbon@libero.it> is both the
 author and the packager.
 
-the sources are obtained from: http://wxperl.sourceforge.net/
+the sources are obtained from: http://wxperl.eu/
 The only change is the addition of the debian/ subdirectory.
 
 COPYRIGHT
 
-Copyright (c) 2000-2005 Mattia Barbon.
+Copyright (c) 2000-2007 Mattia Barbon.
 This package is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
