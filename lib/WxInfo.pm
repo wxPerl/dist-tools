@@ -22,17 +22,17 @@ sub new {
 sub _sharp_bang {
   my( $this, $package, $pl_package ) = @_;
 
-  m/^(?:\#\!)?sub\s+(\w+)/ and do {
+  m/^\#\!sub\s+(\w+)/ and do {
     my $pl_method = "${pl_package}::${1}";
     my $method = "${package}::${1}";
 
     ${$this->{FUNCTIONS}}{$method} = $pl_method;
   } and return 1;
-  m/^\#\!\s+(\w+)/ and do {
-    my $pl_method = "${pl_package}::${1}";
-    my $method = "${package}::${1}";
-
-    ${$this->{FUNCTIONS}}{$method} = $pl_method;
+  m/^\#\!irrelevant\s+class\s+(\w+)/ and do {
+    ${$this->{CLASSES}}{$1} = 'irrelevant';
+  } and return 1;
+  m/^\#\!equivalent\s+class\s+(\w+)\s+(.*)$/ and do {
+    ${$this->{CLASSES}}{$1} = 'equivalent ' . $2;
   } and return 1;
   return 0;
 }
