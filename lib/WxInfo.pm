@@ -28,10 +28,10 @@ sub _sharp_bang {
 
     ${$this->{FUNCTIONS}}{$method} = $pl_method;
   } and return 1;
-  m/^\#\!irrelevant\s+class\s+(\w+)/ and do {
+  m/^\#\!irrelevant\s+class\s+([\w<>]+)/ and do {
     ${$this->{CLASSES}}{$1} = 'irrelevant';
   } and return 1;
-  m/^\#\!equivalent\s+class\s+(\w+)\s+(.*)$/ and do {
+  m/^\#\!equivalent\s+class\s+([\w<>]+)\s+(.*)$/ and do {
     ${$this->{CLASSES}}{$1} = 'equivalent ' . $2;
   } and return 1;
   return 0;
@@ -48,7 +48,9 @@ sub do_scan_pm {
     m/^package\s+([\w\:]+)\s*\;/ and do {
       $pl_package = $package = $1;
       $package =~ s/^Wx::/wx/;
-      ${$pl_classes}{$package} = $pl_package;
+      ${$pl_classes}{$package} = $pl_package
+        unless ( ${$pl_classes}{$package} || '' )
+                   =~ /^(?:irrelevant$|equivalent )/;
       if( /\@ISA\s*=\s*qw\(Wx::(\S+)\)/ ) {
           ${$pl_inheritance}{substr $pl_package, 4}->{$1}++;
       }
@@ -113,12 +115,18 @@ sub do_scan_xs {
     m/INCLUDE:\s+(.*)\|\s*$/ and do {
       my $cmd = $1;
 
+      if( $File::Find::dir =~ /XS$/ ) {
+        chdir File::Spec->updir;
+      }
       open my $in, $cmd . ' |';
+      if( $File::Find::dir =~ /XS$/ ) {
+        chdir 'XS';
+      }
       do_scan_xs( $this, $in );
       next;
     };
     _sharp_bang( $this, $package, $pl_package ) and next;
-    m/^([\w\:]+)\(/ and do {
+    m/^([\w\:]+)\s*\(/ and do {
       ( my $m = $1 ) =~ s/^.*:://;
       my $pl_method = "${pl_package}::${m}";
 

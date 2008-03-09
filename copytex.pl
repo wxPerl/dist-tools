@@ -18,6 +18,7 @@ process_tex();
 exit 0;
 
 sub process_tex {
+  open my $log, ">", "copy.log";
   foreach my $f ( map { glob } @patterns ) {
     my $fname = basename( $f );
     my $destfile = File::Spec->catfile( $dest, $fname );
@@ -29,10 +30,12 @@ sub process_tex {
     binmode OUT;
 
     while( <IN> ) {
-      m/\\class{(\w+)}/ and do {
+      m/\\class{([\w<>]+)}/ and do {
         my $class = $1;
+        $class =~ s/\<\w+\>//;
         print OUT $_;
         if( !exists $pl_classes{$class} ) {
+          print $log "Class $class is not implemented\n";
           print OUT "\n\\perlnote{This class is not implemented in wxPerl}\n";
           $unimplemented_class = 1;
         } elsif( $pl_classes{$class} eq 'irrelevant' ) {
@@ -69,6 +72,8 @@ sub process_tex {
 #            print OUT "\n\\perlnote{This method is inherited from $inherited.}\n";
           }
           else {
+            print $log "Function $function_name is not implemented\n"
+                unless $function_name =~ /^(?:wxDateTime|wxDateSpan|wxTimeSpan)::/;
             print OUT "\n\\perlnote{This method is not implemented in wxPerl}\n";
           }
         }
@@ -87,7 +92,6 @@ sub scan_wxperl {
   *pl_classes = $info->get_classes;
   *pl_funcs = $info->get_methods;
   *pl_inheritance = $info->get_inheritance;
-
 }
 
 exit 0;
